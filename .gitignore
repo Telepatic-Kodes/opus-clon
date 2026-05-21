@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated clips (user content)
+/public/clips/
+
+# playwright test artifacts
+/.playwright-mcp/
+
+# tmp processing files
+/tmp/opus_clon/
