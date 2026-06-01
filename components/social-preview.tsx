@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { Smartphone, Camera, Play, Heart, MessageCircle, Send, Bookmark } from "lucide-react";
 import type { Clip } from "@/types";
 
 interface SocialPreviewProps {
@@ -110,11 +111,11 @@ function InstagramFrame({ clip }: { clip: Clip }) {
         {/* Footer actions */}
         <div className="px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button className="text-white text-base leading-none">♥</button>
-            <button className="text-white text-base leading-none">💬</button>
-            <button className="text-white text-base leading-none">✈️</button>
+            <button className="text-white" aria-label="Me gusta"><Heart className="w-5 h-5" /></button>
+            <button className="text-white" aria-label="Comentar"><MessageCircle className="w-5 h-5" /></button>
+            <button className="text-white" aria-label="Compartir"><Send className="w-5 h-5" /></button>
           </div>
-          <button className="text-white text-base leading-none">🔖</button>
+          <button className="text-white" aria-label="Guardar"><Bookmark className="w-5 h-5" /></button>
         </div>
 
         {/* Like count */}
@@ -189,10 +190,10 @@ function YouTubeFrame({ clip }: { clip: Clip }) {
   );
 }
 
-const PLATFORMS: { id: Platform; emoji: string; label: string }[] = [
-  { id: "tiktok", emoji: "📱", label: "TikTok" },
-  { id: "instagram", emoji: "📸", label: "Instagram" },
-  { id: "youtube", emoji: "🎬", label: "YouTube" },
+const PLATFORMS: { id: Platform; Icon: React.ComponentType<{ className?: string }>; label: string }[] = [
+  { id: "tiktok",    Icon: Smartphone, label: "TikTok" },
+  { id: "instagram", Icon: Camera,     label: "Instagram" },
+  { id: "youtube",   Icon: Play,       label: "YouTube" },
 ];
 
 export default function SocialPreview({
@@ -230,7 +231,7 @@ export default function SocialPreview({
                 ${isActive ? activeClass : inactiveClass}`}
               aria-pressed={isActive}
             >
-              <span>{p.emoji}</span>
+              <p.Icon className="w-4 h-4 flex-shrink-0" />
               <span>{p.label}</span>
             </button>
           );

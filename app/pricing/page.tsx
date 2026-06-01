@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Check } from "lucide-react";
 import Navbar from "@/components/navbar";
 
 export const metadata: Metadata = {
@@ -120,16 +121,18 @@ export default function PricingPage() {
         </p>
 
         {/* Billing toggle — UI only */}
-        <div className="inline-flex items-center gap-3 bg-[#111] border border-[#262626] rounded-full px-2 py-1.5">
-          <button className="px-4 py-1.5 text-sm font-medium text-white bg-[#1f1f1f] rounded-full transition-all">
-            Mensual
-          </button>
-          <button className="px-4 py-1.5 text-sm font-medium text-[#737373] hover:text-white rounded-full transition-all">
-            Anual{" "}
-            <span className="text-violet-400 text-xs font-semibold ml-1">
-              Ahorra 20%
-            </span>
-          </button>
+        <div className="flex flex-col items-center gap-2">
+          <div className="inline-flex items-center gap-1 bg-[#111] border border-[#262626] rounded-full p-1 shadow-inner">
+            <button className="px-5 py-2 text-sm font-semibold text-white bg-[#262626] rounded-full transition-all shadow-sm">
+              Mensual
+            </button>
+            <button className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-[#737373] hover:text-white rounded-full transition-all">
+              Anual
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-400 text-[10px] font-bold tracking-wide uppercase animate-pulse">
+                Ahorra 20%
+              </span>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -150,7 +153,7 @@ export default function PricingPage() {
               <div
                 className={
                   plan.highlight
-                    ? "flex flex-col flex-1 rounded-2xl border-2 border-violet-500/50 bg-gradient-to-b from-violet-500/10 to-[#111] p-8 shadow-xl shadow-violet-500/10"
+                    ? "flex flex-col flex-1 rounded-2xl border-2 border-violet-500/50 bg-gradient-to-b from-violet-500/10 to-[#111] p-8 shadow-2xl shadow-violet-500/20"
                     : "flex flex-col flex-1 rounded-2xl border border-[#262626] bg-[#111] p-8"
                 }
               >
@@ -163,7 +166,7 @@ export default function PricingPage() {
                 {/* Price */}
                 <div className="mb-8">
                   <div className="flex items-end gap-1">
-                    <span className="text-4xl font-bold text-white">
+                    <span className={plan.highlight ? "text-5xl font-black text-white" : "text-4xl font-bold text-white"}>
                       ${plan.price}
                     </span>
                     <span className="text-[#737373] mb-1 text-sm">
@@ -188,9 +191,7 @@ export default function PricingPage() {
                 <ul className="space-y-3 mt-auto">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <span className="text-emerald-400 font-semibold text-sm shrink-0 mt-0.5">
-                        ✓
-                      </span>
+                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <span className="text-sm text-[#a3a3a3]">{feature}</span>
                     </li>
                   ))}

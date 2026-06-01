@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Sparkles, ArrowRight } from "lucide-react";
 import type { JobStatus } from "@/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -85,8 +86,9 @@ export default function RecentClips() {
         transition={{ duration: 0.5 }}
         className="flex items-center gap-3 mb-10"
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-white">
-          ✨ Últimos clips generados
+        <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-violet-400" />
+          Últimos clips generados
         </h2>
         <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -155,8 +157,8 @@ export default function RecentClips() {
 
                     {/* CTA */}
                     <div className="px-4 pb-4">
-                      <span className="text-xs text-violet-400 group-hover:text-violet-300 transition-colors">
-                        Ver clip →
+                      <span className="flex items-center gap-1 text-xs text-violet-400 group-hover:text-violet-300 transition-colors">
+                        Ver clip <ArrowRight className="w-4 h-4" />
                       </span>
                     </div>
                   </Link>

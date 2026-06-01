@@ -311,9 +311,10 @@ export default function Hero() {
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16">
         {/* Background gradient orbs */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-violet-600/10 rounded-full blur-[120px]" />
-          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-violet-800/8 rounded-full blur-[100px]" />
-          <div className="absolute top-1/3 right-1/4 w-[350px] h-[350px] bg-purple-600/8 rounded-full blur-[100px]" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-violet-600/15 rounded-full blur-[120px]" />
+          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-violet-800/10 rounded-full blur-[100px]" />
+          <div className="absolute top-1/3 right-1/4 w-[350px] h-[350px] bg-purple-600/10 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-900/20 rounded-full blur-[100px]" />
           {/* Grid pattern */}
           <div
             className="absolute inset-0 opacity-[0.03]"
@@ -370,11 +371,11 @@ export default function Hero() {
           >
             <form onSubmit={handleFormSubmit} className="flex flex-col sm:flex-row gap-3 mb-3">
               <div
-                className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#111]
+                className={`flex-1 flex items-center gap-3 px-4 py-4 rounded-xl bg-[#111]
                             border transition-colors group
                             ${submitError
                               ? "border-red-500/60"
-                              : "border-[#262626] hover:border-violet-500/50 focus-within:border-violet-500/70"
+                              : "border-[#363636] hover:border-violet-500/50 focus-within:border-violet-500/60"
                             }`}
               >
                 <Link2
@@ -391,7 +392,7 @@ export default function Hero() {
                     setUrl(e.target.value);
                     if (submitError) setSubmitError(null);
                   }}
-                  placeholder="Pega una URL de YouTube, Zoom o Podcast…"
+                  placeholder="Pega la URL del video de YouTube, Podcast o Zoom…"
                   className="flex-1 bg-transparent text-sm text-white placeholder:text-[#525252] outline-none"
                   disabled={isSubmitting}
                   autoComplete="off"
@@ -405,9 +406,9 @@ export default function Hero() {
                 onClick={handleAddToQueue}
                 disabled={isSubmitting || !canAddToQueue}
                 title={urlQueue.length >= MAX_QUEUE ? `Máximo ${MAX_QUEUE} URLs` : "Añadir a la cola"}
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl
+                className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl
                            font-semibold text-sm text-[#a3a3a3] whitespace-nowrap
-                           bg-[#111] border border-[#262626]
+                           bg-[#111] border border-[#363636]
                            hover:text-white hover:border-violet-500/50 hover:bg-[#1a1a1a]
                            disabled:opacity-40 disabled:cursor-not-allowed
                            transition-all duration-200"
@@ -420,7 +421,7 @@ export default function Hero() {
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl
+                className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl
                            font-semibold text-sm text-white whitespace-nowrap
                            bg-gradient-to-r from-violet-600 to-violet-500
                            hover:from-violet-500 hover:to-violet-400
@@ -547,6 +548,21 @@ export default function Hero() {
             </AnimatePresence>
           </motion.div>
 
+          {/* Trust signals — compatible platforms */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="flex items-center gap-3 mt-2 mb-4 justify-center flex-wrap"
+          >
+            <span className="text-xs text-[#525252]">Compatible con:</span>
+            {["YouTube", "Zoom", "Loom", "Podcast"].map((platform) => (
+              <span key={platform} className="text-xs text-[#404040] font-medium">
+                {platform}
+              </span>
+            ))}
+          </motion.div>
+
           {/* Demo options */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -580,17 +596,20 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-16 grid grid-cols-3 gap-6 max-w-lg mx-auto"
+            className="mt-16 flex items-center justify-center gap-0 max-w-lg mx-auto"
           >
             {[
               { value: "16M+", label: "Creadores" },
               { value: "10×", label: "Flujo más rápido" },
               { value: "90%", label: "Tiempo ahorrado" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs text-[#737373] mt-0.5">{stat.label}</div>
-              </div>
+            ].map((stat, i) => (
+              <>
+                {i > 0 && <div key={`sep-${stat.label}`} className="w-px h-10 bg-[#262626] mx-0" />}
+                <div key={stat.label} className="flex-1 text-center">
+                  <div className="text-2xl font-bold text-white">{stat.value}</div>
+                  <div className="text-xs text-[#737373] mt-0.5">{stat.label}</div>
+                </div>
+              </>
             ))}
           </motion.div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { Copy, Check, Anchor, FileText, Pencil, Save, Download, RotateCcw, ChevronDown, ChevronRight } from "lucide-react";
 import type { Clip } from "@/types";
 
 interface CaptionPanelProps {
@@ -296,7 +297,17 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
                 : "bg-[#111] border-[#262626] text-[#a3a3a3] hover:text-white hover:border-[#404040]"
             }`}
         >
-          {copied ? "✓ Copiado" : "📋 Copiar caption"}
+          {copied ? (
+            <>
+              <Check className="w-4 h-4 flex-shrink-0" />
+              Copiado
+            </>
+          ) : (
+            <>
+              <Copy className="w-4 h-4 flex-shrink-0" />
+              Copiar caption
+            </>
+          )}
         </button>
       </section>
 
@@ -304,8 +315,9 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
       {hasHook && (
         <section className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-white">
-              🎣 Hook detectado
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
+              <Anchor className="w-3.5 h-3.5 flex-shrink-0" />
+              Hook detectado
             </span>
             <span className="px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-400 text-xs font-semibold">
               IA
@@ -399,8 +411,13 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
               className={`flex items-center gap-1.5 text-sm font-semibold transition-colors duration-150
                 ${editorOpen ? "text-white" : "text-[#a3a3a3] hover:text-white"}`}
             >
-              <span>{editorOpen ? "▾" : "▸"}</span>
-              <span>✏️ Editar subtítulos</span>
+              {editorOpen ? (
+                <ChevronDown className="w-3.5 h-3.5 flex-shrink-0" />
+              ) : (
+                <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+              )}
+              <Pencil className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>Editar subtítulos</span>
             </button>
 
             {/* Export buttons — visible whenever VTT is loaded */}
@@ -408,19 +425,21 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={downloadSrt}
-                  className="px-2.5 py-1 rounded-lg border border-[#262626] bg-[#111] text-[#a3a3a3]
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#262626] bg-[#111] text-[#a3a3a3]
                              text-xs font-medium hover:text-white hover:border-[#404040] transition-all duration-150"
                   title="Descargar como SRT"
                 >
-                  ⬇ SRT
+                  <Download className="w-3 h-3 flex-shrink-0" />
+                  SRT
                 </button>
                 <button
                   onClick={downloadTxt}
-                  className="px-2.5 py-1 rounded-lg border border-[#262626] bg-[#111] text-[#a3a3a3]
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#262626] bg-[#111] text-[#a3a3a3]
                              text-xs font-medium hover:text-white hover:border-[#404040] transition-all duration-150"
                   title="Descargar solo texto"
                 >
-                  ⬇ TXT
+                  <Download className="w-3 h-3 flex-shrink-0" />
+                  TXT
                 </button>
               </div>
             )}
@@ -476,13 +495,21 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
                             : "bg-violet-500/10 border-violet-500/30 text-violet-400 hover:bg-violet-500/15"
                         }`}
                     >
-                      {savingVtt
-                        ? "Guardando…"
-                        : saveStatus === "saved"
-                        ? "✓ Guardado"
-                        : saveStatus === "error"
-                        ? "✗ Error"
-                        : "💾 Guardar cambios"}
+                      {savingVtt ? (
+                        "Guardando…"
+                      ) : saveStatus === "saved" ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 flex-shrink-0" />
+                          Guardado
+                        </>
+                      ) : saveStatus === "error" ? (
+                        "Error al guardar"
+                      ) : (
+                        <>
+                          <Save className="w-3.5 h-3.5 flex-shrink-0" />
+                          Guardar cambios
+                        </>
+                      )}
                     </button>
 
                     <button
@@ -493,7 +520,8 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
                                  hover:border-[#404040] transition-all duration-150
                                  disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      ↩ Restaurar original
+                      <RotateCcw className="w-3.5 h-3.5 flex-shrink-0" />
+                      Restaurar original
                     </button>
                   </div>
                 </>
@@ -505,7 +533,10 @@ export default function CaptionPanel({ clip }: CaptionPanelProps) {
 
       {/* F. Notas personales */}
       <section className="flex flex-col gap-3">
-        <h3 className="text-sm font-semibold text-white">📝 Notas</h3>
+        <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
+          <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+          Notas
+        </h3>
         <div className="relative">
           <textarea
             value={note}

@@ -93,7 +93,8 @@ export default function Features() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative group rounded-2xl border border-[#262626] bg-gradient-to-br ${feature.gradient} p-px overflow-hidden`}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className={`relative group rounded-2xl border border-[#262626] bg-gradient-to-br ${feature.gradient} p-px overflow-hidden hover:shadow-xl hover:shadow-violet-500/10`}
               >
                 {/* Inner card */}
                 <div className="relative h-full rounded-2xl bg-[#0f0f0f] p-6 lg:p-8 overflow-hidden">

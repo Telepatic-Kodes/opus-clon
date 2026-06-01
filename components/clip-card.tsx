@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Clock, TrendingUp, Captions, Pencil, Check, RefreshCw, Share2 } from "lucide-react";
+import { Download, Clock, TrendingUp, Captions, Pencil, Check, RefreshCw, Share2, Play, Scissors, Smartphone, FileText, Zap, Keyboard } from "lucide-react";
 import type { Clip, ClipFormat } from "@/types";
 import TrimEditor from "@/components/trim-editor";
 import SocialPreview from "@/components/social-preview";
@@ -45,10 +45,10 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-const FORMAT_META: Record<ClipFormat["ratio"], { emoji: string; short: string; aspect: string; resolution: string }> = {
-  "9:16": { emoji: "📱", short: "TikTok",     aspect: "aspect-[9/16]", resolution: "720×1280"  },
-  "1:1":  { emoji: "🟦", short: "Instagram",  aspect: "aspect-square", resolution: "1080×1080" },
-  "16:9": { emoji: "🖥", short: "YouTube",    aspect: "aspect-video",  resolution: "1280×720"  },
+const FORMAT_META: Record<ClipFormat["ratio"], { Icon: React.ComponentType<{ className?: string }>; short: string; aspect: string; resolution: string }> = {
+  "9:16": { Icon: Smartphone, short: "TikTok",     aspect: "aspect-[9/16]", resolution: "720×1280"  },
+  "1:1":  { Icon: FileText,   short: "Instagram",  aspect: "aspect-square", resolution: "1080×1080" },
+  "16:9": { Icon: Play,       short: "YouTube",    aspect: "aspect-video",  resolution: "1280×720"  },
 };
 
 function ratioToFilename(ratio: ClipFormat["ratio"]): string {
@@ -57,11 +57,11 @@ function ratioToFilename(ratio: ClipFormat["ratio"]): string {
 
 // ─── Tab definitions ──────────────────────────────────────────────────────────
 
-const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: "video",   label: "Video",   icon: "▶" },
-  { id: "editor",  label: "Editar",  icon: "✂" },
-  { id: "social",  label: "Social",  icon: "📱" },
-  { id: "caption", label: "Caption", icon: "📋" },
+const TABS: { id: TabId; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "video",   label: "Video",   Icon: Play },
+  { id: "editor",  label: "Editar",  Icon: Scissors },
+  { id: "social",  label: "Social",  Icon: Smartphone },
+  { id: "caption", label: "Caption", Icon: FileText },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -260,16 +260,19 @@ export default function ClipCard({ clip, index, jobId }: ClipCardProps) {
             tabIndex={-1}
             className="w-6 h-6 rounded-full bg-[#1a1a1a] border border-[#333] flex items-center
                        justify-center text-[#525252] hover:text-white hover:border-[#555]
-                       transition-colors opacity-0 group-hover:opacity-100 text-[10px]"
+                       transition-colors opacity-0 group-hover:opacity-100"
             aria-label="Atajos de teclado"
           >
-            ⌨
+            <Keyboard className="w-3 h-3" />
           </button>
           {showShortcutsTooltip && (
             <div className="absolute right-0 top-8 w-48 bg-[#1a1a1a] border border-[#333]
                             rounded-xl p-3 text-[11px] text-[#a3a3a3] space-y-1
                             shadow-xl shadow-black/60 z-30">
-              <p className="text-white font-semibold mb-2 text-xs">⌨ Atajos (foco en card)</p>
+              <div className="flex items-center gap-1.5 text-white font-semibold mb-2 text-xs">
+                <Keyboard className="w-3 h-3" />
+                Atajos (foco en card)
+              </div>
               <p><kbd className="bg-[#2a2a2a] px-1 rounded">Space</kbd> / <kbd className="bg-[#2a2a2a] px-1 rounded">K</kbd> — Play/Pause</p>
               <p><kbd className="bg-[#2a2a2a] px-1 rounded">M</kbd> — Silenciar</p>
               <p><kbd className="bg-[#2a2a2a] px-1 rounded">←</kbd> / <kbd className="bg-[#2a2a2a] px-1 rounded">→</kbd> — ±5s</p>
@@ -369,14 +372,16 @@ export default function ClipCard({ clip, index, jobId }: ClipCardProps) {
                     : "bg-[#1f1f1f] text-[#737373] border-[#333]"
                   }`}
               >
-                ⚡ {localClip.emotionScore}
+                <Zap className="w-3 h-3 flex-shrink-0" />
+                {localClip.emotionScore}
               </span>
 
               {/* Filler words chip (only if > 0) */}
               {localClip.fillerWordsRemoved > 0 && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-medium
                                  bg-green-500/10 text-green-400 border-green-500/20">
-                  ✂ {localClip.fillerWordsRemoved} muletilla{localClip.fillerWordsRemoved !== 1 ? "s" : ""}
+                  <Scissors className="w-3 h-3 flex-shrink-0" />
+                  {localClip.fillerWordsRemoved} muletilla{localClip.fillerWordsRemoved !== 1 ? "s" : ""}
                 </span>
               )}
 
@@ -409,7 +414,7 @@ export default function ClipCard({ clip, index, jobId }: ClipCardProps) {
                   }`}
                 aria-selected={isActive}
               >
-                <span>{tab.icon}</span>
+                <tab.Icon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="hidden sm:inline">{tab.label}</span>
               </button>
             );
@@ -450,7 +455,7 @@ export default function ClipCard({ clip, index, jobId }: ClipCardProps) {
                               title={fmt.label}
                             >
                               <span className="flex items-center gap-1">
-                                <span>{meta?.emoji}</span>
+                                {meta?.Icon && <meta.Icon className="w-3 h-3 flex-shrink-0" />}
                                 <span>{meta?.short ?? fmt.label}</span>
                               </span>
                               {isActive && meta?.resolution && (
@@ -485,7 +490,7 @@ export default function ClipCard({ clip, index, jobId }: ClipCardProps) {
 
                   {/* Video player */}
                   <div
-                    className={`relative ${aspectClass} bg-[#0a0a0a] flex-shrink-0 mt-2 ${!isPlayingManually ? "cursor-pointer" : ""}`}
+                    className={`relative ${aspectClass} bg-[#0a0a0a] flex-shrink-0 mt-2 max-h-[480px] overflow-hidden ${!isPlayingManually ? "cursor-pointer" : ""}`}
                     onMouseEnter={() => {
                       const vid = videoRef.current;
                       if (!vid || isPlayingManually) return;

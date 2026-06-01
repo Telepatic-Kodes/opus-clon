@@ -30,7 +30,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-[#1f1f1f]">
+      <div className="flex items-center justify-between px-5 py-5 border-b border-[#1a1a1a]">
         <Link
           href="/"
           className="flex items-center gap-2.5 group"
@@ -68,14 +68,14 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               href={href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 relative",
                 isActive
-                  ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                  ? "bg-violet-500/10 text-violet-400 border border-violet-500/20 border-l-2 border-l-violet-500"
                   : "text-[#737373] hover:text-white hover:bg-[#1a1a1a] border border-transparent"
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
-              {label}
+              <span>{label}</span>
             </Link>
           );
         })}
