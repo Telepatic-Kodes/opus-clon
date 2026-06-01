@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -12,12 +12,74 @@ import {
   Plus,
   X,
   ListVideo,
+  Settings,
 } from "lucide-react";
 import type { ProcessVideoResponse, JobStatus } from "@/types";
 import ProcessingPanel from "./processing-panel";
 import { saveJob } from "@/lib/local-jobs";
 
 const MAX_QUEUE = 5;
+
+// ── Settings helpers ────────────────────────────────────────────────────────
+
+interface ActiveSettings {
+  model: string;
+  clipCount: number;
+  minDuration: number;
+  maxDuration: number;
+  formats: string[];
+}
+
+const SETTINGS_DEFAULTS: ActiveSettings = {
+  model: "gpt-4o",
+  clipCount: 8,
+  minDuration: 15,
+  maxDuration: 90,
+  formats: ["9:16", "1:1", "16:9"],
+};
+
+/** Reads all configurable processing settings from localStorage. */
+function getSettings(): ActiveSettings {
+  if (typeof window === "undefined") return SETTINGS_DEFAULTS;
+
+  const model = localStorage.getItem("opus_settings_model") ?? SETTINGS_DEFAULTS.model;
+  const clipCount = parseInt(localStorage.getItem("opus_settings_clip_count") ?? String(SETTINGS_DEFAULTS.clipCount), 10);
+  const minDuration = parseInt(localStorage.getItem("opus_settings_min_duration") ?? String(SETTINGS_DEFAULTS.minDuration), 10);
+  const maxDuration = parseInt(localStorage.getItem("opus_settings_max_duration") ?? String(SETTINGS_DEFAULTS.maxDuration), 10);
+
+  // formats is stored as { tiktok: boolean, instagram: boolean, youtube: boolean }
+  let formats = SETTINGS_DEFAULTS.formats;
+  try {
+    const raw = localStorage.getItem("opus_settings_formats");
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, boolean>;
+      const mapped: string[] = [];
+      if (parsed.tiktok)    mapped.push("9:16");
+      if (parsed.instagram) mapped.push("1:1");
+      if (parsed.youtube)   mapped.push("16:9");
+      if (mapped.length > 0) formats = mapped;
+    }
+  } catch {
+    // keep default
+  }
+
+  return {
+    model: model || SETTINGS_DEFAULTS.model,
+    clipCount: isNaN(clipCount) ? SETTINGS_DEFAULTS.clipCount : clipCount,
+    minDuration: isNaN(minDuration) ? SETTINGS_DEFAULTS.minDuration : minDuration,
+    maxDuration: isNaN(maxDuration) ? SETTINGS_DEFAULTS.maxDuration : maxDuration,
+    formats,
+  };
+}
+
+function isNonDefault(s: ActiveSettings): boolean {
+  return (
+    s.model !== SETTINGS_DEFAULTS.model ||
+    s.clipCount !== SETTINGS_DEFAULTS.clipCount ||
+    s.minDuration !== SETTINGS_DEFAULTS.minDuration ||
+    s.maxDuration !== SETTINGS_DEFAULTS.maxDuration
+  );
+}
 
 const demoClips = [
   { label: "Vlog", duration: "45 min" },
@@ -65,6 +127,7 @@ export default function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
+  const [activeSettings, setActiveSettings] = useState<ActiveSettings>(SETTINGS_DEFAULTS);
 
   // Queue processing state
   const [queueActive, setQueueActive] = useState(false);
@@ -72,6 +135,11 @@ export default function Hero() {
   const [queueIndex, setQueueIndex] = useState(0); // 1-based current index
 
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Load settings from localStorage on mount (client-side only)
+  useEffect(() => {
+    setActiveSettings(getSettings());
+  }, []);
 
   // ── Reset to initial state ──────────────────────────────────────────────────
   const handleReset = () => {
@@ -87,10 +155,13 @@ export default function Hero() {
 
   // ── Submit a single URL to the API, returns jobId ──────────────────────────
   const submitUrl = async (submittedUrl: string): Promise<string> => {
+    const settings = getSettings();
+    // Refresh the badge to reflect the snapshot used for this job
+    setActiveSettings(settings);
     const res = await fetch("/api/process-video", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: submittedUrl }),
+      body: JSON.stringify({ url: submittedUrl, ...settings }),
     });
 
     if (!res.ok) {
@@ -377,6 +448,19 @@ export default function Hero() {
                 )}
               </button>
             </form>
+
+            {/* Active settings badge — shown when settings differ from defaults */}
+            {isNonDefault(activeSettings) && (
+              <div className="flex items-center justify-center gap-2 text-xs text-[#525252] mb-3">
+                <Settings className="w-3 h-3" />
+                <span>
+                  Modelo: {activeSettings.model} · {activeSettings.clipCount} clips · {activeSettings.minDuration}s–{activeSettings.maxDuration}s
+                </span>
+                <a href="/dashboard/settings" className="text-violet-400 hover:text-violet-300 transition-colors">
+                  Cambiar
+                </a>
+              </div>
+            )}
 
             {/* Queue progress indicator */}
             <AnimatePresence>

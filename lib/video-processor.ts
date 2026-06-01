@@ -39,6 +39,26 @@ interface WhisperSegment {
 }
 
 // ---------------------------------------------------------------------------
+// Processing settings (user-configurable)
+// ---------------------------------------------------------------------------
+
+export interface ProcessingSettings {
+  model: string;       // "gpt-4o" | "gpt-4o-mini"
+  clipCount: number;   // 5-12
+  minDuration: number; // seconds
+  maxDuration: number; // seconds
+  formats: string[];   // ["9:16","1:1","16:9"]
+}
+
+const DEFAULT_SETTINGS: ProcessingSettings = {
+  model: "gpt-4o",
+  clipCount: 8,
+  minDuration: 15,
+  maxDuration: 90,
+  formats: ["9:16", "1:1", "16:9"],
+};
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -177,16 +197,23 @@ TRANSCRIPT:
 
 export async function identifyViralMoments(
   transcript: string,
-  jobId: string
+  jobId: string,
+  settings: ProcessingSettings
 ): Promise<ViralMoment[]> {
-  await updateJobStatus(jobId, "analyzing", 55, "Identifying viral moments with GPT-4o…");
+  await updateJobStatus(jobId, "analyzing", 55, `Identifying viral moments with ${settings.model}…`);
+
+  // Build a settings-aware prompt
+  const prompt = VIRAL_MOMENTS_PROMPT
+    .replace("5-8", `${Math.max(1, settings.clipCount - 2)}-${settings.clipCount}`)
+    .replace("Each clip MUST be between 15 and 90 seconds long (end - start >= 15 and end - start <= 90).",
+      `Each clip MUST be between ${settings.minDuration} and ${settings.maxDuration} seconds long (end - start >= ${settings.minDuration} and end - start <= ${settings.maxDuration}).`);
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: settings.model,
     messages: [
       {
         role: "user",
-        content: VIRAL_MOMENTS_PROMPT + transcript,
+        content: prompt + transcript,
       },
     ],
     temperature: 0.4,
@@ -205,7 +232,7 @@ export async function identifyViralMoments(
     moments = JSON.parse(match[0]) as ViralMoment[];
   }
 
-  // Validate and clamp moments, filling in defaults for new fields
+  // Validate and clamp moments using settings-driven duration bounds
   const valid = moments.map(m => ({
     ...m,
     hook: m.hook ?? "",
@@ -215,8 +242,8 @@ export async function identifyViralMoments(
     (m) =>
       typeof m.start === "number" &&
       typeof m.end === "number" &&
-      m.end - m.start >= 15 &&
-      m.end - m.start <= 90
+      m.end - m.start >= settings.minDuration &&
+      m.end - m.start <= settings.maxDuration
   );
 
   await updateJobStatus(jobId, "analyzing", 65, `Found ${valid.length} viral moments`);
@@ -413,7 +440,8 @@ export async function cutClips(
   videoPath: string,
   moments: ViralMoment[],
   segments: WhisperSegment[],
-  jobId: string
+  jobId: string,
+  settings: ProcessingSettings
 ): Promise<Clip[]> {
   await updateJobStatus(jobId, "cutting", 70, "Cutting clips…");
 
@@ -439,12 +467,13 @@ export async function cutClips(
     const vttPubPath = path.join(pubJobDir, `${clipId}.vtt`);
     fs.writeFileSync(vttPubPath, vttString, "utf-8");
 
-    // 3. Produce the 3 format variants
-    const formatDefs: Array<{ ratio: "9:16" | "1:1" | "16:9"; label: string; suffix: string }> = [
-      { ratio: "9:16", label: "TikTok / Reels", suffix: "9x16" },
-      { ratio: "1:1",  label: "Instagram",       suffix: "1x1"  },
-      { ratio: "16:9", label: "YouTube / LinkedIn", suffix: "16x9" },
+    // 3. Produce only the format variants the user requested
+    const ALL_FORMAT_DEFS: Array<{ ratio: "9:16" | "1:1" | "16:9"; label: string; suffix: string }> = [
+      { ratio: "9:16", label: "TikTok / Reels",      suffix: "9x16" },
+      { ratio: "1:1",  label: "Instagram",            suffix: "1x1"  },
+      { ratio: "16:9", label: "YouTube / LinkedIn",   suffix: "16x9" },
     ];
+    const formatDefs = ALL_FORMAT_DEFS.filter(def => settings.formats.includes(def.ratio));
 
     const formats: ClipFormat[] = [];
 
@@ -479,8 +508,8 @@ export async function cutClips(
       `Cut clip ${i + 1} of ${total}`
     );
 
-    // The default videoUrl uses the 16:9 format for backward compatibility
-    const defaultFormat = formats.find((f) => f.ratio === "16:9");
+    // The default videoUrl uses the 16:9 format when available, otherwise the first generated format
+    const defaultFormat = formats.find((f) => f.ratio === "16:9") ?? formats[0];
 
     clips.push({
       id: clipId,
@@ -509,7 +538,13 @@ export async function cutClips(
 // Orchestrator
 // ---------------------------------------------------------------------------
 
-export async function processVideo(jobId: string, url: string): Promise<void> {
+export async function processVideo(
+  jobId: string,
+  url: string,
+  userSettings?: Partial<ProcessingSettings>
+): Promise<void> {
+  const settings: ProcessingSettings = { ...DEFAULT_SETTINGS, ...userSettings };
+
   try {
     // 1. Download
     const videoPath = await downloadVideo(url, jobId);
@@ -517,11 +552,11 @@ export async function processVideo(jobId: string, url: string): Promise<void> {
     // 2. Transcribe — now returns { text, segments }
     const { text: transcript, segments } = await transcribeVideo(videoPath, jobId);
 
-    // 3. Identify viral moments
-    const moments = await identifyViralMoments(transcript, jobId);
+    // 3. Identify viral moments (settings-aware model, clip count, duration bounds)
+    const moments = await identifyViralMoments(transcript, jobId, settings);
 
-    // 4. Cut clips (pass segments for VTT + transcript extraction)
-    const clips = await cutClips(videoPath, moments, segments, jobId);
+    // 4. Cut clips (pass segments for VTT + transcript extraction, and formats list)
+    const clips = await cutClips(videoPath, moments, segments, jobId, settings);
 
     // Done
     updateJob(jobId, {

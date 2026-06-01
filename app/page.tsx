@@ -3,6 +3,7 @@ import Hero from "@/components/hero";
 import Features from "@/components/features";
 import WelcomeBanner from "@/components/welcome-banner";
 import RecentClips from "@/components/recent-clips";
+import CtaSection from "@/components/cta-section";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Features />
       <RecentClips />
       <WelcomeBanner />
+      <CtaSection />
 
       {/* Footer */}
       <footer className="border-t border-[#1f1f1f] py-10 px-4 sm:px-6">

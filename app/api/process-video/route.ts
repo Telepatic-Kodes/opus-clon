@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { setJob } from "@/lib/jobs-store";
 import { processVideo } from "@/lib/video-processor";
-import type { Job, ProcessVideoResponse } from "@/types";
+import type { Job, ProcessVideoRequest, ProcessVideoResponse } from "@/types";
 
 function isValidUrl(value: string): boolean {
   try {
@@ -34,7 +34,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const url = (body as { url: string }).url.trim();
+  const {
+    url: rawUrl,
+    model,
+    clipCount,
+    minDuration,
+    maxDuration,
+    formats,
+  } = body as ProcessVideoRequest;
+
+  const url = rawUrl.trim();
 
   if (!isValidUrl(url)) {
     return NextResponse.json(
@@ -58,7 +67,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   setJob(job);
 
   // Fire and forget — do not await so the response is returned immediately.
-  void processVideo(jobId, url);
+  void processVideo(jobId, url, {
+    model: model ?? "gpt-4o",
+    clipCount: clipCount ?? 8,
+    minDuration: minDuration ?? 15,
+    maxDuration: maxDuration ?? 90,
+    formats: formats ?? ["9:16", "1:1", "16:9"],
+  });
 
   const response: ProcessVideoResponse = { jobId, status: "queued" };
   return NextResponse.json(response, { status: 202 });

@@ -49,6 +49,11 @@ export interface Job {
 
 export interface ProcessVideoRequest {
   url: string;
+  model?: string;
+  clipCount?: number;
+  minDuration?: number;
+  maxDuration?: number;
+  formats?: string[];
 }
 
 export interface ProcessVideoResponse {
