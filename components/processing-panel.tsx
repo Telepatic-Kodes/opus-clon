@@ -12,13 +12,13 @@ interface ProcessingPanelProps {
 }
 
 const STATUS_LABELS: Record<JobStatus, string> = {
-  queued: "Getting video ready…",
-  downloading: "Downloading video…",
-  transcribing: "Transcribing audio with AI…",
-  analyzing: "Finding viral moments…",
-  cutting: "Creating your clips…",
-  done: "Your clips are ready!",
-  error: "Something went wrong",
+  queued: "Preparando el video…",
+  downloading: "Descargando video…",
+  transcribing: "Transcribiendo audio con IA…",
+  analyzing: "Buscando momentos virales…",
+  cutting: "Creando tus clips…",
+  done: "¡Tus clips están listos!",
+  error: "Algo salió mal",
 };
 
 // Approximate progress thresholds per status for smooth visual feedback
@@ -35,10 +35,34 @@ const STATUS_PROGRESS: Record<JobStatus, number> = {
 const TERMINAL_STATUSES: JobStatus[] = ["done", "error"];
 const POLL_INTERVAL_MS = 2000;
 
+/** Parse "Creando clip N de M" from message field */
+function parseCuttingProgress(message: string): { current: number; total: number } | null {
+  const match = /clip\s+(\d+)\s+de\s+(\d+)/i.exec(message);
+  if (!match) return null;
+  return { current: parseInt(match[1], 10), total: parseInt(match[2], 10) };
+}
+
+/** Format milliseconds into "Xm Ys" or "menos de 1 min" */
+function formatRemaining(ms: number): string {
+  const totalSecs = Math.max(0, Math.round(ms / 1000));
+  if (totalSecs < 60) return "menos de 1 min";
+  const mins = Math.floor(totalSecs / 60);
+  const secs = totalSecs % 60;
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+}
+
 export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps) {
   const [job, setJob] = useState<JobStatusResponse | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** When processing truly began (status left "queued") */
+  const startTimeRef = useRef<number | null>(null);
+  /** Tracks if we've already sent the "done" browser notification */
+  const notifiedRef = useRef<boolean>(false);
+  /** Previous status so we can detect the queued→downloading transition */
+  const prevStatusRef = useRef<JobStatus>("queued");
 
   const stopPolling = () => {
     if (intervalRef.current !== null) {
@@ -56,6 +80,57 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
       const data = (await res.json()) as JobStatusResponse;
       setJob(data);
       setFetchError(null);
+
+      // Feature 3: record start time when leaving "queued"
+      if (
+        prevStatusRef.current === "queued" &&
+        data.status !== "queued" &&
+        startTimeRef.current === null
+      ) {
+        startTimeRef.current = Date.now();
+      }
+      prevStatusRef.current = data.status;
+
+      // Feature 3: compute estimated remaining time
+      if (
+        startTimeRef.current !== null &&
+        data.status !== "done" &&
+        data.status !== "error"
+      ) {
+        const elapsed = Date.now() - startTimeRef.current;
+        const prog = data.progress ?? STATUS_PROGRESS[data.status];
+        if (prog > 0) {
+          const estimatedTotal = elapsed / (prog / 100);
+          const rem = estimatedTotal - elapsed;
+          setRemaining(rem > 0 ? rem : null);
+        }
+      } else {
+        setRemaining(null);
+      }
+
+      // Feature 1: browser notification when done
+      if (data.status === "done" && !notifiedRef.current) {
+        notifiedRef.current = true;
+        if (
+          typeof window !== "undefined" &&
+          "Notification" in window
+        ) {
+          const clipCount = data.clips?.length ?? 0;
+          const fire = () => {
+            new Notification("¡Tus clips están listos! 🎬", {
+              body: `${clipCount} clips virales generados con IA. Haz clic para verlos.`,
+              icon: "/favicon.ico",
+            });
+          };
+          if (Notification.permission === "granted") {
+            fire();
+          } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then((perm) => {
+              if (perm === "granted") fire();
+            });
+          }
+        }
+      }
 
       if (TERMINAL_STATUSES.includes(data.status)) {
         stopPolling();
@@ -86,8 +161,13 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
   const progress = Math.max(0, Math.min(100, rawProgress));
 
   const statusLabel = fetchError
-    ? "Connection error — retrying…"
+    ? "Error de conexión — reintentando…"
     : STATUS_LABELS[status];
+
+  // Feature 4: cutting progress parsed from message
+  const cuttingProgress = status === "cutting" && job?.message
+    ? parseCuttingProgress(job.message)
+    : null;
 
   return (
     <motion.div
@@ -115,9 +195,9 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
                   <AlertCircle className="w-7 h-7 text-red-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Processing failed</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">El procesamiento falló</h3>
                   <p className="text-[#a3a3a3] text-sm max-w-sm mx-auto">
-                    {job?.error ?? "An unexpected error occurred while processing your video."}
+                    {job?.error ?? "Ocurrió un error inesperado al procesar tu video."}
                   </p>
                 </div>
                 <button
@@ -127,7 +207,7 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
                              text-white text-sm font-semibold transition-all duration-200"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Try again
+                  Intentar de nuevo
                 </button>
               </div>
             ) : (
@@ -161,6 +241,39 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
                   </motion.p>
                 </AnimatePresence>
 
+                {/* Feature 4: analyzing pulse + cutting progress */}
+                <AnimatePresence mode="wait">
+                  {status === "analyzing" && (
+                    <motion.p
+                      key="analyzing-hint"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-sm text-[#a3a3a3] flex items-center gap-1.5"
+                    >
+                      <span>🔍 Analizando momentos virales</span>
+                      <span className="animate-pulse font-bold text-violet-400">…</span>
+                    </motion.p>
+                  )}
+                  {status === "cutting" && cuttingProgress && (
+                    <motion.p
+                      key={`cutting-${cuttingProgress.current}`}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-sm text-[#a3a3a3]"
+                    >
+                      ✂ Creando clip{" "}
+                      <span className="animate-pulse font-semibold text-violet-300">
+                        {cuttingProgress.current}
+                      </span>{" "}
+                      de {cuttingProgress.total}…
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
                 {/* Progress bar */}
                 <div className="w-full max-w-sm">
                   <div className="h-2 rounded-full bg-[#1a1a1a] border border-[#262626] overflow-hidden">
@@ -172,10 +285,21 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
                   </div>
                   <div className="flex justify-between mt-2">
                     <span className="text-xs text-[#525252]">
-                      {fetchError ? "Retrying…" : "Processing"}
+                      {fetchError ? "Reintentando…" : "Procesando"}
                     </span>
                     <span className="text-xs text-[#525252]">{Math.round(progress)}%</span>
                   </div>
+
+                  {/* Feature 3: Estimated time remaining */}
+                  {remaining !== null && !isError && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-1.5 text-xs text-[#525252] text-center"
+                    >
+                      ⏱ Tiempo estimado: ~{formatRemaining(remaining)}
+                    </motion.p>
+                  )}
                 </div>
 
                 {/* Step pills */}
@@ -243,7 +367,7 @@ export default function ProcessingPanel({ jobId, onReset }: ProcessingPanelProps
                        bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{fetchError} — will retry automatically.</span>
+            <span>{fetchError} — se reintentará automáticamente.</span>
           </motion.div>
         )}
       </AnimatePresence>

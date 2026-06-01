@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, use } from "react";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  Download,
-  Play,
   Clock,
   CheckCircle2,
   XCircle,
@@ -14,9 +13,11 @@ import {
   ExternalLink,
   Film,
   AlertTriangle,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Job, Clip, JobStatus } from "@/types";
+import type { Clip, Job, JobStatus } from "@/types";
+import ClipCard from "@/components/clip-card";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ function formatDuration(seconds: number): string {
 function StatusBadge({ status }: { status: JobStatus }) {
   const configs: Record<JobStatus, { label: string; className: string; icon: React.ReactNode }> = {
     done: {
-      label: "Done",
+      label: "Completado",
       className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
     },
@@ -49,27 +50,27 @@ function StatusBadge({ status }: { status: JobStatus }) {
       icon: <XCircle className="w-3.5 h-3.5" />,
     },
     queued: {
-      label: "Queued",
+      label: "En cola",
       className: "bg-[#262626] text-[#737373] border-[#333]",
       icon: <Clock className="w-3.5 h-3.5" />,
     },
     downloading: {
-      label: "Downloading",
+      label: "Descargando",
       className: "bg-violet-500/15 text-violet-400 border-violet-500/25",
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
     },
     transcribing: {
-      label: "Transcribing",
+      label: "Transcribiendo",
       className: "bg-violet-500/15 text-violet-400 border-violet-500/25",
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
     },
     analyzing: {
-      label: "Analyzing",
+      label: "Analizando",
       className: "bg-violet-500/15 text-violet-400 border-violet-500/25",
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
     },
     cutting: {
-      label: "Cutting clips",
+      label: "Cortando clips",
       className: "bg-violet-500/15 text-violet-400 border-violet-500/25",
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
     },
@@ -92,12 +93,12 @@ function StatusBadge({ status }: { status: JobStatus }) {
 // ─── Progress panel ───────────────────────────────────────────────────────────
 
 const STEPS: { status: JobStatus; label: string }[] = [
-  { status: "queued", label: "Queued" },
-  { status: "downloading", label: "Downloading video" },
-  { status: "transcribing", label: "Transcribing audio" },
-  { status: "analyzing", label: "Finding viral moments" },
-  { status: "cutting", label: "Cutting clips" },
-  { status: "done", label: "Complete" },
+  { status: "queued", label: "En cola" },
+  { status: "downloading", label: "Descargando video" },
+  { status: "transcribing", label: "Transcribiendo audio" },
+  { status: "analyzing", label: "Buscando momentos virales" },
+  { status: "cutting", label: "Cortando clips" },
+  { status: "done", label: "Completado" },
 ];
 
 const STATUS_ORDER: Record<JobStatus, number> = {
@@ -115,7 +116,7 @@ function ProgressPanel({ job }: { job: Job }) {
 
   return (
     <div className="rounded-2xl border border-[#262626] bg-[#111] p-6">
-      <h2 className="text-sm font-semibold text-white mb-5">Processing status</h2>
+      <h2 className="text-sm font-semibold text-white mb-5">Estado del procesamiento</h2>
 
       {/* Step list */}
       <div className="space-y-3 mb-6">
@@ -177,98 +178,140 @@ function ProgressPanel({ job }: { job: Job }) {
   );
 }
 
-// ─── Clip card ────────────────────────────────────────────────────────────────
+// ─── Analytics section ────────────────────────────────────────────────────────
 
-function ClipCard({ clip, index }: { clip: Clip; index: number }) {
-  const [playing, setPlaying] = useState(false);
+function scoreBarColor(score: number): string {
+  if (score >= 80) return "bg-emerald-500";
+  if (score >= 60) return "bg-yellow-500";
+  return "bg-orange-500";
+}
+
+function AnalyticsSection({ clips }: { clips: Clip[] }) {
+  // ── derived stats ──────────────────────────────────────────────────────────
+  const avgScore = Math.round(clips.reduce((acc, c) => acc + c.score, 0) / clips.length);
+  const topClip = [...clips].sort((a, b) => b.score - a.score)[0];
+  const totalMinutes = +(clips.reduce((acc, c) => acc + (c.duration ?? 0), 0) / 60).toFixed(1);
+  const totalFillerWords = clips.reduce((acc, c) => acc + (c.fillerWordsRemoved ?? 0), 0);
+  // Approximate total segments as clips.length * avg duration / 30 (rough unit)
+  const fillerPct = clips.length > 0
+    ? Math.min(100, Math.round((totalFillerWords / (clips.length * 5)) * 100))
+    : 0;
+
+  // ── hashtag frequency ─────────────────────────────────────────────────────
+  const hashtagCounts = new Map<string, number>();
+  for (const clip of clips) {
+    for (const tag of clip.hashtags) {
+      hashtagCounts.set(tag, (hashtagCounts.get(tag) ?? 0) + 1);
+    }
+  }
+  const maxCount = Math.max(1, ...hashtagCounts.values());
+  const sortedTags = [...hashtagCounts.entries()].sort((a, b) => b[1] - a[1]);
+
+  function tagSizeClass(count: number): string {
+    const ratio = count / maxCount;
+    if (ratio > 0.66) return "text-base font-semibold text-white";
+    if (ratio > 0.33) return "text-sm font-medium text-[#a3a3a3]";
+    return "text-xs text-[#737373]";
+  }
+
+  const copyToClipboard = (text: string) => {
+    void navigator.clipboard.writeText(text).catch(() => undefined);
+    // tiny transient feedback via DOM
+    const el = document.createElement("div");
+    el.textContent = `Copiado: ${text}`;
+    el.className = [
+      "fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]",
+      "px-4 py-2 rounded-xl bg-[#1a1a1a] border border-[#333]",
+      "text-sm text-white shadow-lg shadow-black/40 pointer-events-none",
+    ].join(" ");
+    document.body.appendChild(el);
+    setTimeout(() => { el.style.opacity = "0"; setTimeout(() => el.remove(), 300); }, 1800);
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.05, ease: "easeOut" }}
-      className="rounded-2xl border border-[#262626] bg-[#111] overflow-hidden hover:border-[#333] transition-colors"
-    >
-      {/* Video player */}
-      <div className="relative aspect-[9/16] max-h-72 bg-[#0d0d0d] w-full flex items-center justify-center overflow-hidden">
-        {clip.videoUrl ? (
-          <video
-            src={clip.videoUrl}
-            className="w-full h-full object-cover"
-            controls={playing}
-            poster={clip.thumbnailUrl}
-            onPlay={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
-          />
-        ) : (
-          <Film className="w-10 h-10 text-[#333]" />
-        )}
+    <div className="mt-10">
+      <h2 className="text-base font-semibold text-white mb-5 flex items-center gap-2">
+        📊 Análisis del video
+      </h2>
 
-        {!playing && clip.videoUrl && (
-          <button
-            className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
-            onClick={() => {
-              const vid = document.querySelector<HTMLVideoElement>(
-                `video[src="${clip.videoUrl}"]`
-              );
-              void vid?.play();
-            }}
-          >
-            <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/25 transition-colors">
-              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-            </div>
-          </button>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="p-4 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold text-white leading-snug flex-1">
-            {clip.title}
-          </h3>
-          <span className="flex-shrink-0 px-2 py-0.5 rounded-md bg-violet-500/20 text-violet-400 text-xs font-bold">
-            {clip.score}
-          </span>
+      {/* ── A. Summary stats ─────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <div className="rounded-2xl border border-[#262626] bg-[#111] p-4 flex flex-col gap-1">
+          <span className="text-xs text-[#737373]">Score promedio</span>
+          <span className="text-2xl font-bold text-white">{avgScore}</span>
+          <span className="text-xs text-[#525252]">de todos los clips</span>
         </div>
-
-        <p className="text-xs text-[#737373] flex items-center gap-1.5">
-          <Clock className="w-3 h-3 flex-shrink-0" />
-          {formatDuration(clip.start)} – {formatDuration(clip.end)}
-          <span className="text-[#404040]">·</span>
-          {formatDuration(clip.duration)}
-        </p>
-
-        {clip.reason && (
-          <p className="text-xs text-[#525252] italic leading-relaxed line-clamp-2">
-            {clip.reason}
-          </p>
-        )}
-
-        {clip.transcript && (
-          <details className="group">
-            <summary className="text-xs text-[#525252] hover:text-[#737373] cursor-pointer select-none transition-colors">
-              Show transcript
-            </summary>
-            <p className="mt-2 text-xs text-[#737373] leading-relaxed max-h-28 overflow-y-auto">
-              {clip.transcript}
-            </p>
-          </details>
-        )}
-
-        {/* Download */}
-        {clip.videoUrl && (
-          <a
-            href={clip.videoUrl}
-            download={`${clip.title}.mp4`}
-            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-medium text-[#737373] hover:text-white border border-[#262626] hover:border-[#333] hover:bg-[#1a1a1a] transition-all"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Download clip
-          </a>
-        )}
+        <div className="rounded-2xl border border-[#262626] bg-[#111] p-4 flex flex-col gap-1">
+          <span className="text-xs text-[#737373]">Clip más viral</span>
+          <span className="text-sm font-bold text-violet-400 line-clamp-2 leading-tight">
+            {topClip ? (topClip.title.length > 28 ? topClip.title.slice(0, 28) + "…" : topClip.title) : "—"}
+          </span>
+          <span className="text-xs text-[#525252]">score {topClip?.score ?? 0}</span>
+        </div>
+        <div className="rounded-2xl border border-[#262626] bg-[#111] p-4 flex flex-col gap-1">
+          <span className="text-xs text-[#737373]">Minutos generados</span>
+          <span className="text-2xl font-bold text-white">{totalMinutes}</span>
+          <span className="text-xs text-[#525252]">de contenido total</span>
+        </div>
+        <div className="rounded-2xl border border-[#262626] bg-[#111] p-4 flex flex-col gap-1">
+          <span className="text-xs text-[#737373]">Muletillas (% elim.)</span>
+          <span className="text-2xl font-bold text-white">{fillerPct}%</span>
+          <span className="text-xs text-[#525252]">{totalFillerWords} eliminadas</span>
+        </div>
       </div>
-    </motion.div>
+
+      {/* ── B. Score bar chart ───────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-[#262626] bg-[#111] p-5 mb-4">
+        <h3 className="text-sm font-semibold text-white mb-4">
+          Score por clip
+        </h3>
+        <div className="flex flex-col gap-2.5">
+          {[...clips].sort((a, b) => b.score - a.score).map((clip) => (
+            <div key={clip.id} className="flex items-center gap-3">
+              <span className="text-xs text-[#737373] w-32 flex-shrink-0 truncate" title={clip.title}>
+                {clip.title}
+              </span>
+              <div className="flex-1 h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
+                <div
+                  style={{ width: `${clip.score}%` }}
+                  className={`h-full rounded-full transition-all duration-500 ${scoreBarColor(clip.score)}`}
+                />
+              </div>
+              <span className="text-xs text-white w-8 text-right flex-shrink-0">{clip.score}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── C. Hashtag cloud ─────────────────────────────────────────────── */}
+      {sortedTags.length > 0 && (
+        <div className="rounded-2xl border border-[#262626] bg-[#111] p-5">
+          <h3 className="text-sm font-semibold text-white mb-1">
+            Hashtags
+            <span className="ml-2 text-xs font-normal text-[#525252]">
+              click para copiar
+            </span>
+          </h3>
+          <p className="text-xs text-[#525252] mb-3">
+            Tamaño proporcional a frecuencia entre clips
+          </p>
+          <div className="flex flex-wrap gap-2 items-baseline">
+            {sortedTags.map(([tag, count]) => (
+              <button
+                key={tag}
+                onClick={() => copyToClipboard(tag)}
+                title={`Aparece en ${count} clip${count !== 1 ? "s" : ""} — click para copiar`}
+                className={`px-2.5 py-1 rounded-full border border-[#2a2a2a] bg-[#1a1a1a]
+                            hover:border-violet-500/40 hover:bg-violet-500/10
+                            transition-all duration-150 cursor-pointer ${tagSizeClass(count)}`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -332,7 +375,7 @@ export default function JobDetailPage({
       <div className="flex-1 flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
-          <p className="text-sm text-[#737373]">Loading job…</p>
+          <p className="text-sm text-[#737373]">Cargando…</p>
         </div>
       </div>
     );
@@ -345,16 +388,16 @@ export default function JobDetailPage({
         <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-5">
           <AlertTriangle className="w-6 h-6 text-red-400" />
         </div>
-        <h2 className="text-lg font-semibold text-white mb-2">Job not found</h2>
+        <h2 className="text-lg font-semibold text-white mb-2">Trabajo no encontrado</h2>
         <p className="text-sm text-[#737373] mb-6">
-          This job ID doesn&apos;t exist or the server was restarted.
+          Este ID no existe o el servidor fue reiniciado.
         </p>
         <Link
           href="/dashboard"
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to projects
+          Volver a proyectos
         </Link>
       </div>
     );
@@ -390,14 +433,26 @@ export default function JobDetailPage({
             </a>
             <p className="text-xs text-[#525252] mt-1 flex items-center gap-1.5">
               <Clock className="w-3 h-3" />
-              Created {formatDate(job.createdAt)}
+              Creado {formatDate(job.createdAt)}
             </p>
           </div>
 
           {job.status === "done" && (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 font-medium flex-shrink-0">
-              <CheckCircle2 className="w-4 h-4" />
-              {job.clips.length} clips ready
+            <div className="flex items-center gap-3 flex-shrink-0 flex-wrap">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 font-medium">
+                <CheckCircle2 className="w-4 h-4" />
+                {job.clips.length} clips listos
+              </div>
+              <a
+                href={`/api/export/${job.id}`}
+                download
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
+                           text-white bg-gradient-to-r from-violet-600 to-violet-500
+                           hover:from-violet-500 hover:to-violet-400 transition-all"
+              >
+                <Download className="w-4 h-4" />
+                Descargar todo (ZIP)
+              </a>
             </div>
           )}
         </div>
@@ -410,9 +465,9 @@ export default function JobDetailPage({
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 flex items-start gap-3 mb-6">
             <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-400 mb-1">Processing failed</p>
+              <p className="text-sm font-medium text-red-400 mb-1">El procesamiento falló</p>
               <p className="text-xs text-[#737373]">
-                {job.error ?? "An unknown error occurred. Please try again."}
+                {job.error ?? "Ocurrió un error desconocido. Por favor intenta de nuevo."}
               </p>
             </div>
           </div>
@@ -429,24 +484,29 @@ export default function JobDetailPage({
         {job.status === "done" && job.clips.length > 0 && (
           <div>
             <h2 className="text-base font-semibold text-white mb-5">
-              Generated clips
+              Clips generados
               <span className="ml-2 text-sm text-[#737373] font-normal">
                 ({job.clips.length})
               </span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {job.clips.map((clip, i) => (
-                <ClipCard key={clip.id} clip={clip} index={i} />
+                <ClipCard key={clip.id} clip={clip} index={i} jobId={job.id} />
               ))}
             </div>
           </div>
+        )}
+
+        {/* Analytics section */}
+        {job.status === "done" && job.clips.length > 0 && (
+          <AnalyticsSection clips={job.clips} />
         )}
 
         {/* Done but no clips */}
         {job.status === "done" && job.clips.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <Film className="w-10 h-10 text-[#333] mb-4" />
-            <p className="text-sm text-[#737373]">No clips were generated for this video.</p>
+            <p className="text-sm text-[#737373]">No se generaron clips para este video.</p>
           </div>
         )}
       </div>

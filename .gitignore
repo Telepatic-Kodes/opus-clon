@@ -43,6 +43,9 @@ next-env.d.ts
 # generated clips (user content)
 /public/clips/
 
+# SQLite database
+/data/
+
 # playwright test artifacts
 /.playwright-mcp/
 

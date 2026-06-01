@@ -1,20 +1,67 @@
 /**
- * In-memory job store using a module-level Map singleton.
- * NOTE: This is suitable for dev/demo only. Jobs will not persist
- * across server restarts or across multiple serverless instances.
+ * SQLite-backed job store using better-sqlite3.
+ * Public interface is identical to the previous in-memory implementation
+ * so no callers need to change.
  */
 
+import db from "@/lib/db";
 import type { Job, JobStatus } from "@/types";
 
-// Module-level singleton — shared across all imports within the same process.
-const store = new Map<string, Job>();
+// ---------------------------------------------------------------------------
+// Row shape returned by better-sqlite3
+// ---------------------------------------------------------------------------
+
+interface JobRow {
+  id: string;
+  url: string;
+  status: string;
+  progress: number;
+  message: string;
+  clips: string;
+  error: string | null;
+  created_at: number;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function rowToJob(row: JobRow): Job {
+  return {
+    id: row.id,
+    url: row.url,
+    status: row.status as Job["status"],
+    progress: row.progress,
+    message: row.message,
+    clips: JSON.parse(row.clips) as Job["clips"],
+    ...(row.error !== null ? { error: row.error } : {}),
+    createdAt: row.created_at,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 export function getJob(id: string): Job | undefined {
-  return store.get(id);
+  const row = db.prepare("SELECT * FROM jobs WHERE id = ?").get(id) as JobRow | undefined;
+  return row ? rowToJob(row) : undefined;
 }
 
 export function setJob(job: Job): void {
-  store.set(job.id, job);
+  db.prepare(`
+    INSERT OR REPLACE INTO jobs (id, url, status, progress, message, clips, error, created_at)
+    VALUES (@id, @url, @status, @progress, @message, @clips, @error, @created_at)
+  `).run({
+    id: job.id,
+    url: job.url,
+    status: job.status,
+    progress: job.progress,
+    message: job.message,
+    clips: JSON.stringify(job.clips ?? []),
+    error: job.error ?? null,
+    created_at: job.createdAt,
+  });
 }
 
 /**
@@ -22,10 +69,10 @@ export function setJob(job: Job): void {
  * existing record; the rest are left intact.
  */
 export function updateJob(id: string, patch: Partial<Job>): Job | undefined {
-  const existing = store.get(id);
+  const existing = getJob(id);
   if (!existing) return undefined;
   const updated: Job = { ...existing, ...patch };
-  store.set(id, updated);
+  setJob(updated);
   return updated;
 }
 
@@ -35,11 +82,34 @@ export function updateJobStatus(
   progress: number,
   message: string
 ): Job | undefined {
-  return updateJob(id, { status, progress, message });
+  db.prepare(
+    "UPDATE jobs SET status = ?, progress = ?, message = ? WHERE id = ?"
+  ).run(status, progress, message, id);
+  return getJob(id);
 }
 
 export function getAllJobs(): Job[] {
-  return Array.from(store.values());
+  const rows = db
+    .prepare("SELECT * FROM jobs ORDER BY created_at DESC LIMIT 50")
+    .all() as JobRow[];
+  return rows.map(rowToJob);
 }
 
-export { store as jobsStore };
+export function deleteJob(id: string): void {
+  db.prepare("DELETE FROM jobs WHERE id = ?").run(id);
+}
+
+// ---------------------------------------------------------------------------
+// Legacy compat — callers that imported `jobsStore` directly
+// ---------------------------------------------------------------------------
+
+/**
+ * Proxy object that satisfies the `Map<string, Job>` subset used by callers
+ * that imported `jobsStore` from this module. Backed by SQLite under the hood.
+ */
+export const jobsStore = {
+  get: (id: string) => getJob(id),
+  set: (_id: string, job: Job) => { setJob(job); return jobsStore; },
+  has: (id: string) => getJob(id) !== undefined,
+  values: () => getAllJobs()[Symbol.iterator](),
+};

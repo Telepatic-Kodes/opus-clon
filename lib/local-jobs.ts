@@ -60,6 +60,20 @@ export function getJobIds(): LocalJob[] {
 }
 
 /**
+ * Remove a single job entry by jobId.
+ */
+export function removeJob(jobId: string): void {
+  if (typeof window === "undefined") return;
+  const existing = getJobIds();
+  const updated = existing.filter((j) => j.jobId !== jobId);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch {
+    console.warn("Could not write to localStorage");
+  }
+}
+
+/**
  * Remove all stored job entries.
  */
 export function clearJobs(): void {

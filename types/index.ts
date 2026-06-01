@@ -6,6 +6,15 @@ export interface ViralMoment {
   title: string;
   reason: string;
   score: number;   // 0-100 virality score
+  hook: string;
+  emotionScore: number;
+  hashtags: string[];
+}
+
+export interface ClipFormat {
+  ratio: "9:16" | "1:1" | "16:9";
+  label: string;   // "TikTok / Reels", "Instagram", "YouTube / LinkedIn"
+  videoUrl: string;
 }
 
 export interface Clip {
@@ -17,8 +26,14 @@ export interface Clip {
   transcript: string;
   reason: string;
   score: number;
-  videoUrl: string;    // relative public path e.g. /clips/<jobId>/<id>.mp4
-  thumbnailUrl?: string;
+  videoUrl: string;        // 16:9 original (backward-compatible default)
+  thumbnailUrl: string;    // /clips/<jobId>/<id>_thumb.jpg (empty string if extraction failed)
+  captionsUrl?: string;    // WebVTT URL e.g. /clips/<jobId>/<id>.vtt
+  formats: ClipFormat[];   // all 3 format variants
+  hashtags: string[];      // ["#viral", "#tips", "#marketing"]
+  hook: string;            // "Abre con estadística sorprendente"
+  emotionScore: number;    // 0-100 energía/emoción del momento
+  fillerWordsRemoved: number; // cuántas muletillas eliminadas
 }
 
 export interface Job {
@@ -48,4 +63,6 @@ export interface JobStatusResponse {
   message: string;
   clips: Clip[];
   error?: string;
+  createdAt: number;
+  url: string;
 }

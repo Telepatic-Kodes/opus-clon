@@ -8,49 +8,49 @@ const features = [
     icon: Scissors,
     title: "ClipAnything",
     description:
-      "Our AI watches your entire video, detects the most engaging moments, and extracts 10 viral-ready clips automatically. No editing skills required.",
-    badge: "AI Powered",
+      "Nuestra IA analiza todo tu video, detecta los momentos más atractivos y extrae 10 clips virales automáticamente. Sin necesidad de editar.",
+    badge: "Con IA",
     gradient: "from-violet-500/20 to-purple-500/10",
     iconBg: "bg-violet-500/15 text-violet-400",
     highlight: "from-violet-500 to-purple-500",
-    metric: "10× faster",
-    metricLabel: "clip creation",
+    metric: "10× más rápido",
+    metricLabel: "creación de clips",
   },
   {
     icon: Type,
     title: "Auto Captions",
     description:
-      "Generate animated, speaker-aware captions with 99%+ accuracy. Customize fonts, colors, and animations to match your brand in seconds.",
-    badge: "AI Powered",
+      "Genera subtítulos animados con detección de hablante y 99%+ de precisión. Personaliza fuentes, colores y animaciones para tu marca en segundos.",
+    badge: "Con IA",
     gradient: "from-blue-500/20 to-cyan-500/10",
     iconBg: "bg-blue-500/15 text-blue-400",
     highlight: "from-blue-500 to-cyan-500",
     metric: "99%+",
-    metricLabel: "accuracy",
+    metricLabel: "precisión",
   },
   {
     icon: Expand,
     title: "ReframeAnything",
     description:
-      "Intelligently reframe any horizontal video for 9:16, 1:1, or any aspect ratio. The AI tracks speakers and action to keep your subjects perfectly centered.",
-    badge: "AI Powered",
+      "Reencuadra inteligentemente cualquier video horizontal a 9:16, 1:1 o cualquier proporción. La IA rastrea hablantes y acción para mantener el foco perfecto.",
+    badge: "Con IA",
     gradient: "from-emerald-500/20 to-teal-500/10",
     iconBg: "bg-emerald-500/15 text-emerald-400",
     highlight: "from-emerald-500 to-teal-500",
-    metric: "3 formats",
-    metricLabel: "auto-generated",
+    metric: "3 formatos",
+    metricLabel: "auto-generados",
   },
   {
     icon: Film,
     title: "B-Roll AI",
     description:
-      "Automatically source and insert contextually relevant B-roll footage that matches your content. Turn talking-head videos into dynamic, professional productions.",
-    badge: "AI Powered",
+      "Busca e inserta automáticamente imágenes de B-roll contextualmente relevantes. Transforma videos de cabeza parlante en producciones dinámicas y profesionales.",
+    badge: "Con IA",
     gradient: "from-orange-500/20 to-amber-500/10",
     iconBg: "bg-orange-500/15 text-orange-400",
     highlight: "from-orange-500 to-amber-500",
     metric: "1M+",
-    metricLabel: "stock clips",
+    metricLabel: "clips de stock",
   },
 ];
 
@@ -68,17 +68,17 @@ export default function Features() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-sm font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-            AI Models
+            Modelos de IA
           </div>
           <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-            Everything you need to go{" "}
+            Todo lo que necesitas para{" "}
             <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-              viral
+              volverte viral
             </span>
           </h2>
           <p className="text-lg text-[#737373] max-w-2xl mx-auto">
-            Four powerful AI models working together to transform any long video
-            into platform-optimized short clips that drive results.
+            Cuatro modelos de IA trabajando juntos para transformar cualquier video largo
+            en clips cortos optimizados para cada plataforma.
           </p>
         </motion.div>
 
@@ -154,11 +154,11 @@ export default function Features() {
             href="#"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 transition-all duration-200 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
           >
-            Start creating for free
+            Empieza a crear gratis
             <span className="text-violet-200">→</span>
           </a>
           <p className="mt-3 text-xs text-[#525252]">
-            No credit card required · 90 free credits on signup
+            Sin tarjeta de crédito · 90 créditos gratis al registrarte
           </p>
         </motion.div>
       </div>

@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Home", href: "/", icon: LayoutDashboard },
   { label: "My Projects", href: "/dashboard", icon: Folder },
-  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ] as const;
 
 // ─── Sidebar content ──────────────────────────────────────────────────────────

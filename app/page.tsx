@@ -1,6 +1,8 @@
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import Features from "@/components/features";
+import WelcomeBanner from "@/components/welcome-banner";
+import RecentClips from "@/components/recent-clips";
 
 export default function Home() {
   return (
@@ -8,6 +10,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Features />
+      <RecentClips />
+      <WelcomeBanner />
 
       {/* Footer */}
       <footer className="border-t border-[#1f1f1f] py-10 px-4 sm:px-6">
@@ -17,11 +21,11 @@ export default function Home() {
               <span className="text-white text-xs font-bold">O</span>
             </div>
             <span className="text-sm text-[#737373]">
-              © 2025 OpusClip. All rights reserved.
+              © 2025 OpusClip. Todos los derechos reservados.
             </span>
           </div>
           <div className="flex items-center gap-6">
-            {["Privacy", "Terms", "Contact"].map((link) => (
+            {["Privacidad", "Términos", "Contacto"].map((link) => (
               <a
                 key={link}
                 href="#"

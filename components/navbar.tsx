@@ -5,10 +5,10 @@ import { Zap, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Resources", href: "#resources" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Funciones", href: "#features" },
+  { label: "Soluciones", href: "#solutions" },
+  { label: "Recursos", href: "#resources" },
+  { label: "Precios", href: "#pricing" },
 ];
 
 export default function Navbar() {
@@ -61,13 +61,13 @@ export default function Navbar() {
               href="#"
               className="text-sm text-[#a3a3a3] hover:text-white transition-colors"
             >
-              Sign in
+              Iniciar sesión
             </a>
             <a
               href="#"
               className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 transition-all duration-200 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
             >
-              Get free clips
+              Obtener clips gratis
             </a>
           </div>
 
@@ -101,13 +101,13 @@ export default function Navbar() {
                 href="#"
                 className="block px-4 py-3 text-sm text-center text-[#a3a3a3] hover:text-white rounded-lg hover:bg-white/5 transition-all"
               >
-                Sign in
+                Iniciar sesión
               </a>
               <a
                 href="#"
                 className="block px-4 py-3 text-sm font-semibold text-center text-white rounded-lg bg-gradient-to-r from-violet-600 to-violet-500"
               >
-                Get free clips
+                Obtener clips gratis
               </a>
             </div>
           </div>

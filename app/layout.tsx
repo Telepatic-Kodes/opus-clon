@@ -9,12 +9,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "OpusClip — Turn long videos into viral shorts",
+  title: "OpusClip — Convierte videos largos en clips virales",
   description:
-    "OpusClip uses AI to repurpose your long videos into 10 viral short clips in one click. Used by 16M+ creators and businesses.",
+    "OpusClip usa IA para convertir tus videos largos en 10 clips cortos virales con un clic. Usado por más de 16M de creadores y empresas.",
   openGraph: {
-    title: "OpusClip — Turn long videos into viral shorts",
-    description: "AI-powered video repurposing tool for creators and marketers.",
+    title: "OpusClip — Convierte videos largos en clips virales",
+    description: "Herramienta de repurposing de video con IA para creadores y marketers.",
     type: "website",
   },
 };

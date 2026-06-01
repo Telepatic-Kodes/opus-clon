@@ -12,7 +12,7 @@ import ffmpeg from "fluent-ffmpeg";
 import OpenAI from "openai";
 import { v4 as uuidv4 } from "uuid";
 import { updateJob, updateJobStatus } from "@/lib/jobs-store";
-import type { Clip, ViralMoment } from "@/types";
+import type { Clip, ClipFormat, ViralMoment } from "@/types";
 
 const execAsync = promisify(exec);
 
@@ -29,22 +29,32 @@ ffmpeg.setFfmpegPath(FFMPEG_PATH);
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ---------------------------------------------------------------------------
+// Internal types
+// ---------------------------------------------------------------------------
+
+interface WhisperSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function tmpDir(jobId: string): string {
+export function tmpDir(jobId: string): string {
   return path.join("/tmp", "opus_clon", jobId);
 }
 
-function clipsDir(jobId: string): string {
+export function clipsDir(jobId: string): string {
   return path.join(tmpDir(jobId), "clips");
 }
 
-function publicJobDir(jobId: string): string {
+export function publicJobDir(jobId: string): string {
   return path.join(PUBLIC_CLIPS_DIR, jobId);
 }
 
-function findVideoFile(jobId: string): string {
+export function findVideoFile(jobId: string): string {
   const dir = tmpDir(jobId);
   // yt-dlp may produce video.mp4, video.webm, video.mkv, etc.
   const entries = fs
@@ -82,7 +92,6 @@ export async function downloadVideo(url: string, jobId: string): Promise<string>
   await updateJobStatus(jobId, "downloading", 20, "Download complete");
 
   return findVideoFile(jobId);
-
 }
 
 // ---------------------------------------------------------------------------
@@ -92,7 +101,7 @@ export async function downloadVideo(url: string, jobId: string): Promise<string>
 export async function transcribeVideo(
   videoPath: string,
   jobId: string
-): Promise<string> {
+): Promise<{ text: string; segments: WhisperSegment[] }> {
   await updateJobStatus(jobId, "transcribing", 25, "Extracting audio…");
 
   const audioPath = path.join(tmpDir(jobId), "audio.mp3");
@@ -113,17 +122,25 @@ export async function transcribeVideo(
 
   const audioStream = fs.createReadStream(audioPath);
 
-  // verbose_json gives us word-level timestamps when available
+  // verbose_json gives us segment-level timestamps
   const transcription = await openai.audio.transcriptions.create({
     file: audioStream,
     model: "whisper-1",
     response_format: "verbose_json",
   });
 
+  // Save full JSON for debugging
+  const transcriptJsonPath = path.join(tmpDir(jobId), "transcript.json");
+  fs.writeFileSync(transcriptJsonPath, JSON.stringify(transcription, null, 2), "utf-8");
+
   await updateJobStatus(jobId, "transcribing", 50, "Transcription complete");
 
-  // verbose_json returns an object with a `text` field
-  return (transcription as { text: string }).text;
+  const raw = transcription as unknown as { text: string; segments?: WhisperSegment[] };
+
+  return {
+    text: raw.text,
+    segments: raw.segments ?? [],
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -137,9 +154,21 @@ RULES:
 - Each clip MUST be between 15 and 90 seconds long (end - start >= 15 and end - start <= 90).
 - Timestamps must be in SECONDS as floating-point numbers.
 - Return ONLY a valid JSON array with no markdown, no explanation, no code fences.
-- Each element must have exactly these fields:
-  { "start": <float>, "end": <float>, "title": <string>, "reason": <string>, "score": <integer 0-100> }
+- Each element must have EXACTLY these fields:
+  {
+    "start": <float>,
+    "end": <float>,
+    "title": <string>,
+    "reason": <string>,
+    "score": <integer 0-100>,
+    "hook": <string>,
+    "emotionScore": <integer 0-100>,
+    "hashtags": <array of 5-7 strings>
+  }
 - "score" represents virality potential (0 = low, 100 = extremely viral).
+- "hook" is a short description of the opening hook technique used in the clip (e.g., "Rhetorical question that creates curiosity", "Surprising statistic reveal", "Bold controversial statement").
+- "emotionScore" represents the emotional energy/intensity of the moment (0 = calm/dry, 100 = extremely emotional/energetic).
+- "hashtags" must be an array of 5-7 relevant hashtags for that specific clip, WITHOUT the # symbol (e.g., ["marketing", "viral", "tips", "entrepreneurship", "mindset"]).
 - Prioritize: surprising insights, emotional peaks, strong opinions, story climaxes, quotable statements.
 - Do NOT overlap clips. Sort by start time ascending.
 
@@ -176,8 +205,13 @@ export async function identifyViralMoments(
     moments = JSON.parse(match[0]) as ViralMoment[];
   }
 
-  // Validate and clamp moments
-  const valid = moments.filter(
+  // Validate and clamp moments, filling in defaults for new fields
+  const valid = moments.map(m => ({
+    ...m,
+    hook: m.hook ?? "",
+    emotionScore: m.emotionScore ?? 50,
+    hashtags: Array.isArray(m.hashtags) ? m.hashtags : [],
+  })).filter(
     (m) =>
       typeof m.start === "number" &&
       typeof m.end === "number" &&
@@ -191,10 +225,173 @@ export async function identifyViralMoments(
 }
 
 // ---------------------------------------------------------------------------
-// Step 4 — Cut clips
+// Step 4 — VTT generation
 // ---------------------------------------------------------------------------
 
-function cutClip(
+function toVttTime(secs: number): string {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const hh = String(h).padStart(2, "0");
+  const mm = String(m).padStart(2, "0");
+  // toFixed(3) gives "SS.mmm"; pad integer part to 2 digits
+  const ss = s.toFixed(3).padStart(6, "0");
+  return `${hh}:${mm}:${ss}`;
+}
+
+function generateVtt(
+  segments: WhisperSegment[],
+  clipStart: number,
+  clipEnd: number
+): string {
+  const duration = clipEnd - clipStart;
+
+  const relevant = segments.filter(
+    (seg) => seg.end > clipStart && seg.start < clipEnd
+  );
+
+  let vtt = "WEBVTT\n\n";
+
+  relevant.forEach((seg, idx) => {
+    const start = Math.max(0, seg.start - clipStart);
+    const end = Math.min(duration, seg.end - clipStart);
+    vtt += `${idx + 1}\n`;
+    vtt += `${toVttTime(start)} --> ${toVttTime(end)}\n`;
+    vtt += `${seg.text.trim()}\n\n`;
+  });
+
+  return vtt;
+}
+
+// ---------------------------------------------------------------------------
+// Step 4 — Reframe clips
+// ---------------------------------------------------------------------------
+
+export function reframeClip(
+  inputPath: string,
+  outputPath: string,
+  ratio: "9:16" | "1:1" | "16:9"
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let cmd = ffmpeg(inputPath);
+
+    if (ratio === "9:16") {
+      cmd = cmd.outputOptions([
+        "-vf",
+        "scale=-2:1280,crop=720:1280",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "fast",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+      ]);
+    } else if (ratio === "1:1") {
+      cmd = cmd.outputOptions([
+        "-vf",
+        "crop=ih:ih:(iw-ih)/2:0,scale=1080:1080",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "fast",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+      ]);
+    } else {
+      // 16:9 — scale to 1280x720, no crop needed for landscape input
+      cmd = cmd.outputOptions([
+        "-vf",
+        "scale=1280:720",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "fast",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+      ]);
+    }
+
+    cmd
+      .output(outputPath)
+      .on("end", () => resolve())
+      .on("error", (err: Error) => reject(err))
+      .run();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Step 4 — Extract thumbnail
+// ---------------------------------------------------------------------------
+
+export async function extractThumbnail(
+  clipPath: string,
+  clipId: string,
+  jobId: string,
+  durationSecs: number
+): Promise<string> {
+  const pubJobDir = publicJobDir(jobId);
+  const thumbPath = path.join(pubJobDir, `${clipId}_thumb.jpg`);
+  const midpoint = durationSecs / 2;
+
+  await new Promise<void>((resolve) => {
+    ffmpeg(clipPath)
+      .setStartTime(midpoint)
+      .frames(1)
+      .outputOptions(["-q:v 2"])
+      .output(thumbPath)
+      .on("end", () => resolve())
+      .on("error", () => resolve()) // don't fail the whole pipeline for a thumbnail
+      .run();
+  });
+
+  return fs.existsSync(thumbPath) ? `/clips/${jobId}/${clipId}_thumb.jpg` : "";
+}
+
+// ---------------------------------------------------------------------------
+// Step 4 — Remove filler words from segments
+// ---------------------------------------------------------------------------
+
+const FILLER_WORDS = [
+  "um", "uh", "eh", "ah", "er", "like", "you know", "i mean",
+  "basically", "literally", "actually", "so", "well", "right", "okay",
+  "o sea", "este", "bueno", "pues", "como que", "o sea que",
+];
+
+function removeFillersFromSegments(
+  segments: WhisperSegment[],
+  clipStart: number,
+  clipEnd: number
+): { cleanSegments: WhisperSegment[]; fillerCount: number } {
+  const relevant = segments.filter(s => s.end > clipStart && s.start < clipEnd);
+  let fillerCount = 0;
+  const cleanSegments = relevant.filter(seg => {
+    const text = seg.text.trim().toLowerCase().replace(/[.,!?]/g, "");
+    const isFiller = FILLER_WORDS.some(
+      f => text === f || text === f + " " || text.split(" ").every(w => FILLER_WORDS.includes(w))
+    );
+    if (isFiller) { fillerCount++; return false; }
+    return true;
+  });
+  return { cleanSegments, fillerCount };
+}
+
+// ---------------------------------------------------------------------------
+// Step 4 — Cut clips (base helper)
+// ---------------------------------------------------------------------------
+
+export function cutClip(
   videoPath: string,
   start: number,
   end: number,
@@ -215,6 +412,7 @@ function cutClip(
 export async function cutClips(
   videoPath: string,
   moments: ViralMoment[],
+  segments: WhisperSegment[],
   jobId: string
 ): Promise<Clip[]> {
   await updateJobStatus(jobId, "cutting", 70, "Cutting clips…");
@@ -231,13 +429,47 @@ export async function cutClips(
   for (let i = 0; i < total; i++) {
     const moment = moments[i];
     const clipId = uuidv4();
-    const tmpClipPath = path.join(tmpClipsDir, `${clipId}.mp4`);
-    const pubClipPath = path.join(pubJobDir, `${clipId}.mp4`);
 
-    await cutClip(videoPath, moment.start, moment.end, tmpClipPath);
+    // 1. Cut base clip (16:9, stream copy — fast)
+    const baseTmpPath = path.join(tmpClipsDir, `${clipId}_base.mp4`);
+    await cutClip(videoPath, moment.start, moment.end, baseTmpPath);
 
-    // Copy to public/clips/<jobId>/<id>.mp4 so Next.js serves it as static
-    fs.copyFileSync(tmpClipPath, pubClipPath);
+    // 2. Generate and save WebVTT captions
+    const vttString = generateVtt(segments, moment.start, moment.end);
+    const vttPubPath = path.join(pubJobDir, `${clipId}.vtt`);
+    fs.writeFileSync(vttPubPath, vttString, "utf-8");
+
+    // 3. Produce the 3 format variants
+    const formatDefs: Array<{ ratio: "9:16" | "1:1" | "16:9"; label: string; suffix: string }> = [
+      { ratio: "9:16", label: "TikTok / Reels", suffix: "9x16" },
+      { ratio: "1:1",  label: "Instagram",       suffix: "1x1"  },
+      { ratio: "16:9", label: "YouTube / LinkedIn", suffix: "16x9" },
+    ];
+
+    const formats: ClipFormat[] = [];
+
+    for (const def of formatDefs) {
+      const tmpOut = path.join(tmpClipsDir, `${clipId}_${def.suffix}.mp4`);
+      await reframeClip(baseTmpPath, tmpOut, def.ratio);
+
+      const pubFileName = `${clipId}_${def.suffix}.mp4`;
+      const pubOut = path.join(pubJobDir, pubFileName);
+      fs.copyFileSync(tmpOut, pubOut);
+
+      formats.push({
+        ratio: def.ratio,
+        label: def.label,
+        videoUrl: `/clips/${jobId}/${pubFileName}`,
+      });
+    }
+
+    // 4. Remove filler words and extract clean transcript for this clip
+    const clipDuration = moment.end - moment.start;
+    const { cleanSegments, fillerCount } = removeFillersFromSegments(segments, moment.start, moment.end);
+    const clipTranscript = cleanSegments.map((seg) => seg.text.trim()).join(" ");
+
+    // 5. Extract thumbnail from the base clip
+    const thumbnailUrl = await extractThumbnail(baseTmpPath, clipId, jobId, clipDuration);
 
     const progress = 70 + Math.round(((i + 1) / total) * 25);
     await updateJobStatus(
@@ -247,16 +479,26 @@ export async function cutClips(
       `Cut clip ${i + 1} of ${total}`
     );
 
+    // The default videoUrl uses the 16:9 format for backward compatibility
+    const defaultFormat = formats.find((f) => f.ratio === "16:9");
+
     clips.push({
       id: clipId,
       title: moment.title,
       start: moment.start,
       end: moment.end,
-      duration: Math.round((moment.end - moment.start) * 10) / 10,
-      transcript: "",   // could be sliced from verbose_json segments in a future iteration
+      duration: Math.round(clipDuration * 10) / 10,
+      transcript: clipTranscript,
       reason: moment.reason,
       score: moment.score,
-      videoUrl: `/clips/${jobId}/${clipId}.mp4`,
+      videoUrl: defaultFormat?.videoUrl ?? `/clips/${jobId}/${clipId}_16x9.mp4`,
+      thumbnailUrl,
+      captionsUrl: `/clips/${jobId}/${clipId}.vtt`,
+      formats,
+      hook: moment.hook,
+      emotionScore: moment.emotionScore,
+      hashtags: moment.hashtags.map(t => t.startsWith("#") ? t : `#${t}`),
+      fillerWordsRemoved: fillerCount,
     });
   }
 
@@ -272,14 +514,14 @@ export async function processVideo(jobId: string, url: string): Promise<void> {
     // 1. Download
     const videoPath = await downloadVideo(url, jobId);
 
-    // 2. Transcribe
-    const transcript = await transcribeVideo(videoPath, jobId);
+    // 2. Transcribe — now returns { text, segments }
+    const { text: transcript, segments } = await transcribeVideo(videoPath, jobId);
 
     // 3. Identify viral moments
     const moments = await identifyViralMoments(transcript, jobId);
 
-    // 4. Cut clips
-    const clips = await cutClips(videoPath, moments, jobId);
+    // 4. Cut clips (pass segments for VTT + transcript extraction)
+    const clips = await cutClips(videoPath, moments, segments, jobId);
 
     // Done
     updateJob(jobId, {
