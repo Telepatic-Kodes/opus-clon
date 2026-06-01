@@ -21,19 +21,43 @@ const FORMAT_BUTTONS: { ratio: ClipFormat["ratio"]; label: string }[] = [
 ];
 
 function ScoreBadge({ score, emotionScore }: { score: number; emotionScore: number }) {
-  let colorClass = "bg-orange-500/20 text-orange-400 border-orange-500/30";
-  if (score >= 80) colorClass = "bg-green-500/20 text-green-400 border-green-500/30";
-  else if (score >= 60) colorClass = "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+  let badgeStyle = {
+    background: "rgba(255,120,0,0.15)",
+    color: "#FF8C42",
+    border: "1px solid rgba(255,120,0,0.30)",
+  };
+  if (score >= 80) {
+    badgeStyle = {
+      background: "rgba(168,255,0,0.12)",
+      color: "#A8FF00",
+      border: "1px solid rgba(168,255,0,0.30)",
+    };
+  } else if (score >= 60) {
+    badgeStyle = {
+      background: "rgba(255,200,0,0.12)",
+      color: "#FFD600",
+      border: "1px solid rgba(255,200,0,0.30)",
+    };
+  }
 
   return (
     <div className="flex items-center gap-2 flex-wrap justify-center">
       <span
-        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full border text-sm font-semibold ${colorClass}`}
+        className="inline-flex items-center gap-1 px-3 py-1 text-sm font-semibold"
+        style={{ ...badgeStyle, fontFamily: "var(--font-mono)" }}
       >
-        🔥 Score {score}
+        Score {score}
       </span>
-      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full border text-sm font-medium bg-orange-500/10 text-orange-300 border-orange-500/20">
-        ⚡ Energía {emotionScore}
+      <span
+        className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium"
+        style={{
+          background: "rgba(168,255,0,0.08)",
+          color: "#A8FF00",
+          border: "1px solid rgba(168,255,0,0.20)",
+          fontFamily: "var(--font-mono)",
+        }}
+      >
+        Energía {emotionScore}
       </span>
     </div>
   );
@@ -59,32 +83,43 @@ function ShareButtons({ shareUrl }: { shareUrl: string }) {
       {/* Copy link button */}
       <button
         onClick={handleCopy}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl w-full
-                   bg-[#111] border border-[#262626] hover:border-violet-500/40
-                   text-sm font-medium transition-all duration-200
-                   hover:text-violet-300 text-[#a3a3a3]"
+        className="flex items-center gap-2 px-4 py-2.5 w-full text-sm font-medium transition-all duration-200 uppercase tracking-widest"
+        style={{
+          background: "#12131A",
+          border: copied ? "1px solid #A8FF00" : "1px solid #1E2030",
+          color: copied ? "#A8FF00" : "#6B6D82",
+          fontFamily: "var(--font-mono)",
+        }}
       >
         {copied ? (
-          <Check className="w-4 h-4 text-green-400" />
+          <Check className="w-4 h-4" style={{ color: "#A8FF00" }} />
         ) : (
           <Link2 className="w-4 h-4" />
         )}
-        {copied ? "✓ Copiado" : "🔗 Copiar link"}
+        {copied ? "Copiado" : "Copiar link"}
       </button>
 
       {/* Social share row */}
       <div className="flex items-center gap-2 w-full">
-        <span className="text-xs text-[#525252] whitespace-nowrap">Compartir en:</span>
+        <span
+          className="text-xs whitespace-nowrap"
+          style={{ color: "#6B6D82", fontFamily: "var(--font-mono)" }}
+        >
+          Compartir en:
+        </span>
 
         {/* Twitter / X */}
         <a
           href={`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl
-                     bg-[#111] border border-[#262626] hover:border-[#444]
-                     text-xs font-medium text-[#a3a3a3] hover:text-white
-                     transition-all duration-200"
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-all duration-200 uppercase tracking-widest"
+          style={{
+            background: "#12131A",
+            border: "1px solid #1E2030",
+            color: "#6B6D82",
+            fontFamily: "var(--font-mono)",
+          }}
         >
           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
@@ -97,10 +132,13 @@ function ShareButtons({ shareUrl }: { shareUrl: string }) {
           href={`https://wa.me/?text=${encodedText}+${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl
-                     bg-[#111] border border-[#262626] hover:border-[#444]
-                     text-xs font-medium text-[#a3a3a3] hover:text-white
-                     transition-all duration-200"
+          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-all duration-200 uppercase tracking-widest"
+          style={{
+            background: "#12131A",
+            border: "1px solid #1E2030",
+            color: "#6B6D82",
+            fontFamily: "var(--font-mono)",
+          }}
         >
           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -186,10 +224,18 @@ export default function ShareClientPage({
   // ── Loading ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "#0B0C10" }}
+      >
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
-          <p className="text-sm text-[#737373]">Cargando clip…</p>
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#A8FF00" }} />
+          <p
+            className="text-sm uppercase tracking-widest"
+            style={{ color: "#6B6D82", fontFamily: "var(--font-mono)" }}
+          >
+            Cargando clip…
+          </p>
         </div>
       </div>
     );
@@ -198,17 +244,39 @@ export default function ShareClientPage({
   // ── Not found ──
   if (notFound || !data) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-5">
-          <AlertTriangle className="w-6 h-6 text-red-400" />
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-6 text-center"
+        style={{ background: "#0B0C10" }}
+      >
+        <div
+          className="w-14 h-14 flex items-center justify-center mb-5"
+          style={{
+            background: "rgba(255,59,59,0.10)",
+            border: "1px solid rgba(255,59,59,0.20)",
+          }}
+        >
+          <AlertTriangle className="w-6 h-6" style={{ color: "#FF3B3B" }} />
         </div>
-        <h2 className="text-lg font-semibold text-white mb-2">Clip no encontrado</h2>
-        <p className="text-sm text-[#737373] mb-6">
+        <h2
+          className="text-lg font-semibold mb-2 uppercase tracking-widest"
+          style={{ color: "#F0F0F2", fontFamily: "var(--font-display)" }}
+        >
+          Clip no encontrado
+        </h2>
+        <p
+          className="text-sm mb-6"
+          style={{ color: "#6B6D82", fontFamily: "var(--font-sans)" }}
+        >
           Este clip no existe o fue eliminado.
         </p>
         <Link
           href="/"
-          className="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors"
+          className="px-5 py-2.5 text-sm font-semibold uppercase tracking-widest transition-colors"
+          style={{
+            background: "#A8FF00",
+            color: "#0B0C10",
+            fontFamily: "var(--font-mono)",
+          }}
         >
           Ir a AIAIAI
         </Link>
@@ -219,24 +287,35 @@ export default function ShareClientPage({
   const { clip } = data;
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "#0B0C10" }}
+    >
       {/* ── Top bar ── */}
       <header className="fixed top-0 left-0 right-0 z-30 px-5 py-4 flex items-center">
         <Link
           href="/"
-          className="flex items-center gap-2.5 text-white/80 hover:text-white transition-colors"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
         >
           {/* Logo */}
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shrink-0">
-            <Zap className="w-4 h-4 text-white fill-white" />
+          <div className="w-7 h-7 flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5" style={{ color: "#A8FF00" }} />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="font-black text-sm tracking-tighter">
-              <span className="text-white">AI</span>
-              <span className="text-violet-400">AI</span>
-              <span className="text-white">AI</span>
+            <span
+              className="font-black text-sm tracking-tighter"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              <span style={{ color: "#F0F0F2" }}>AI</span>
+              <span style={{ color: "#A8FF00" }}>AI</span>
+              <span style={{ color: "#F0F0F2" }}>AI</span>
             </span>
-            <span className="text-[10px] text-violet-400/80 font-normal">IA que crea clips virales</span>
+            <span
+              className="text-[10px] font-normal"
+              style={{ color: "#A8FF00", opacity: 0.7, fontFamily: "var(--font-mono)" }}
+            >
+              IA que crea clips virales
+            </span>
           </div>
         </Link>
       </header>
@@ -246,7 +325,13 @@ export default function ShareClientPage({
         <div className="w-full max-w-lg flex flex-col items-center gap-6">
 
           {/* Video player */}
-          <div className="w-full aspect-video bg-[#0a0a0a] rounded-2xl overflow-hidden border border-[#1f1f1f] shadow-2xl shadow-violet-500/10">
+          <div
+            className="w-full aspect-video overflow-hidden"
+            style={{
+              background: "#12131A",
+              border: "1px solid #1E2030",
+            }}
+          >
             <video
               key={videoUrl}
               ref={videoRef}
@@ -271,10 +356,20 @@ export default function ShareClientPage({
 
           {/* Clip info */}
           <div className="w-full flex flex-col items-center gap-3 text-center">
-            <h1 className="text-2xl font-bold text-white leading-tight">{clip.title}</h1>
+            <h1
+              className="text-2xl font-bold leading-tight uppercase tracking-wide"
+              style={{ color: "#F0F0F2", fontFamily: "var(--font-display)" }}
+            >
+              {clip.title}
+            </h1>
             <ScoreBadge score={clip.score} emotionScore={clip.emotionScore} />
             {clip.hook && (
-              <p className="text-sm italic text-[#a3a3a3]">"{clip.hook}"</p>
+              <p
+                className="text-sm italic"
+                style={{ color: "#6B6D82", fontFamily: "var(--font-sans)" }}
+              >
+                &ldquo;{clip.hook}&rdquo;
+              </p>
             )}
           </div>
 
@@ -288,11 +383,13 @@ export default function ShareClientPage({
                 <button
                   key={ratio}
                   onClick={() => setActiveRatio(ratio)}
-                  className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150
-                    ${isActive
-                      ? "bg-violet-500/20 border-violet-500/50 text-violet-300"
-                      : "bg-[#111] border-[#262626] text-[#737373] hover:text-white hover:border-[#444]"
-                    }`}
+                  className="px-4 py-2 text-sm font-medium transition-all duration-150 uppercase tracking-widest"
+                  style={{
+                    background: isActive ? "rgba(168,255,0,0.10)" : "#12131A",
+                    border: isActive ? "1px solid rgba(168,255,0,0.50)" : "1px solid #1E2030",
+                    color: isActive ? "#A8FF00" : "#6B6D82",
+                    fontFamily: "var(--font-mono)",
+                  }}
                 >
                   {label}
                 </button>
@@ -305,11 +402,12 @@ export default function ShareClientPage({
             <button
               onClick={() => void handleDownload()}
               disabled={isDownloading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
-                         bg-violet-600 hover:bg-violet-500 disabled:bg-violet-600/50
-                         text-white text-sm font-semibold transition-all duration-200
-                         shadow-md shadow-violet-500/20 hover:shadow-violet-500/40
-                         disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 uppercase tracking-widest disabled:cursor-not-allowed disabled:opacity-60"
+              style={{
+                background: "#A8FF00",
+                color: "#0B0C10",
+                fontFamily: "var(--font-mono)",
+              }}
             >
               <Download className="w-4 h-4" />
               {isDownloading ? "Descargando…" : "Descargar"}
@@ -317,12 +415,15 @@ export default function ShareClientPage({
 
             <Link
               href="/"
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
-                         bg-[#111] border border-[#262626] hover:border-violet-500/40
-                         text-white text-sm font-semibold transition-all duration-200
-                         hover:text-violet-300"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 uppercase tracking-widest"
+              style={{
+                background: "#12131A",
+                border: "1px solid #1E2030",
+                color: "#6B6D82",
+                fontFamily: "var(--font-mono)",
+              }}
             >
-              Crear mis propios clips →
+              Crear mis clips →
             </Link>
           </div>
 
@@ -335,7 +436,13 @@ export default function ShareClientPage({
               {clip.hashtags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 rounded-full border border-[#2a2a2a] bg-[#111] text-xs text-[#737373]"
+                  className="px-2.5 py-1 text-xs"
+                  style={{
+                    border: "1px solid #1E2030",
+                    background: "#12131A",
+                    color: "#6B6D82",
+                    fontFamily: "var(--font-mono)",
+                  }}
                 >
                   {tag}
                 </span>
@@ -346,7 +453,10 @@ export default function ShareClientPage({
       </main>
 
       {/* ── Footer ── */}
-      <footer className="text-center py-6 text-xs text-[#525252]">
+      <footer
+        className="text-center py-6 text-xs uppercase tracking-widest"
+        style={{ color: "#4B4D62", fontFamily: "var(--font-mono)" }}
+      >
         Generado con AIAIAI · IA de video
       </footer>
     </div>

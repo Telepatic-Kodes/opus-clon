@@ -1,167 +1,177 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Scissors, Type, Expand, Film } from "lucide-react";
+import { Scissors, Type, Expand, Film, ArrowRight } from "lucide-react";
 
 const features = [
   {
+    num: "01",
     icon: Scissors,
     title: "ClipAnything",
+    tag: "DETECCIÓN VIRAL",
     description:
-      "Nuestra IA analiza todo tu video, detecta los momentos más atractivos y extrae 10 clips virales automáticamente. Sin necesidad de editar.",
-    badge: "Con IA",
-    gradient: "from-violet-500/20 to-purple-500/10",
-    iconBg: "bg-violet-500/15 text-violet-400",
-    highlight: "from-violet-500 to-purple-500",
-    metric: "10× más rápido",
-    metricLabel: "creación de clips",
+      "IA que analiza tu video completo y extrae los 8–12 momentos con mayor potencial viral. Sin editar.",
+    metric: "10×",
+    metricLabel: "MÁS RÁPIDO",
   },
   {
+    num: "02",
     icon: Type,
     title: "Auto Captions",
+    tag: "SUBTÍTULOS IA",
     description:
-      "Genera subtítulos animados con detección de hablante y 99%+ de precisión. Personaliza fuentes, colores y animaciones para tu marca en segundos.",
-    badge: "Con IA",
-    gradient: "from-blue-500/20 to-cyan-500/10",
-    iconBg: "bg-blue-500/15 text-blue-400",
-    highlight: "from-blue-500 to-cyan-500",
+      "Transcripción con Whisper. Subtítulos sincronizados, exportables como SRT o VTT.",
     metric: "99%+",
-    metricLabel: "precisión",
+    metricLabel: "PRECISIÓN",
   },
   {
+    num: "03",
     icon: Expand,
     title: "ReframeAnything",
+    tag: "MULTI-FORMATO",
     description:
-      "Reencuadra inteligentemente cualquier video horizontal a 9:16, 1:1 o cualquier proporción. La IA rastrea hablantes y acción para mantener el foco perfecto.",
-    badge: "Con IA",
-    gradient: "from-emerald-500/20 to-teal-500/10",
-    iconBg: "bg-emerald-500/15 text-emerald-400",
-    highlight: "from-emerald-500 to-teal-500",
-    metric: "3 formatos",
-    metricLabel: "auto-generados",
+      "Reencuadre automático para 9:16, 1:1 y 16:9. La IA rastrea al hablante en todo momento.",
+    metric: "3",
+    metricLabel: "FORMATOS",
   },
   {
+    num: "04",
     icon: Film,
     title: "B-Roll AI",
+    tag: "EDICIÓN AUTOMÁTICA",
     description:
-      "Busca e inserta automáticamente imágenes de B-roll contextualmente relevantes. Transforma videos de cabeza parlante en producciones dinámicas y profesionales.",
-    badge: "Con IA",
-    gradient: "from-orange-500/20 to-amber-500/10",
-    iconBg: "bg-orange-500/15 text-orange-400",
-    highlight: "from-orange-500 to-amber-500",
+      "Detecta y elimina muletillas. Inserta B-roll contextual. Exporta listos para publicar.",
     metric: "1M+",
-    metricLabel: "clips de stock",
+    metricLabel: "CLIPS STOCK",
   },
 ];
 
 export default function Features() {
   return (
-    <section id="features" className="py-24 lg:py-32 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-sm font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-            Modelos de IA
+    <section
+      id="features"
+      className="py-24 px-6 lg:px-12"
+      style={{ borderTop: "1px solid #1E2030" }}
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-end justify-between mb-16">
+          <div>
+            <p
+              className="text-xs tracking-widest mb-3"
+              style={{ fontFamily: "var(--font-mono)", color: "#A8FF00" }}
+            >
+              MODELOS DE IA / v2.0
+            </p>
+            <h2
+              className="font-black uppercase leading-none"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(32px, 5vw, 64px)",
+              }}
+            >
+              TODO LO QUE
+              <br />
+              NECESITAS.
+            </h2>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-            Todo lo que necesitas para{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-              volverte viral
-            </span>
-          </h2>
-          <p className="text-lg text-[#737373] max-w-2xl mx-auto">
-            Cuatro modelos de IA trabajando juntos para transformar cualquier video largo
-            en clips cortos optimizados para cada plataforma.
-          </p>
-        </motion.div>
+          <a
+            href="/"
+            className="hidden md:flex items-center gap-2 px-6 py-3 font-black uppercase tracking-widest text-xs transition-colors"
+            style={{
+              fontFamily: "var(--font-display)",
+              background: "#A8FF00",
+              color: "#0B0C10",
+            }}
+          >
+            EMPEZAR <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+        </div>
 
-        {/* Features grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {features.map((feature, i) => {
-            const Icon = feature.icon;
+        {/* Features list */}
+        <div className="space-y-0">
+          {features.map((f, i) => {
+            const Icon = f.icon;
             return (
               <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className={`relative group rounded-2xl border border-[#262626] bg-gradient-to-br ${feature.gradient} p-px overflow-hidden hover:shadow-xl hover:shadow-violet-500/10`}
+                key={f.num}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="group flex items-start gap-6 py-8 cursor-default"
+                style={{ borderBottom: "1px solid #1E2030" }}
               >
-                {/* Inner card */}
-                <div className="relative h-full rounded-2xl bg-[#0f0f0f] p-6 lg:p-8 overflow-hidden">
-                  {/* Hover glow */}
-                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${feature.gradient} pointer-events-none`} />
+                {/* Number */}
+                <span
+                  className="font-black text-4xl w-16 flex-shrink-0 pt-1 transition-colors"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "#1E2030",
+                  }}
+                >
+                  {f.num}
+                </span>
 
-                  <div className="relative z-10">
-                    {/* Icon + badge row */}
-                    <div className="flex items-start justify-between mb-6">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${feature.iconBg} ring-1 ring-white/5`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${feature.highlight} text-white shadow-sm`}
-                      >
-                        <span className="w-1 h-1 rounded-full bg-white/80" />
-                        {feature.badge}
-                      </span>
-                    </div>
+                {/* Icon */}
+                <div
+                  className="w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1"
+                  style={{ border: "1px solid #1E2030" }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: "#6B6D82" }} />
+                </div>
 
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-violet-100 transition-colors">
-                      {feature.title}
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3
+                      className="font-black uppercase text-lg"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
+                      {f.title}
                     </h3>
+                    <span
+                      className="text-xs px-2 py-0.5 tracking-widest"
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        color: "#A8FF00",
+                        border: "1px solid rgba(168,255,0,0.3)",
+                        background: "rgba(168,255,0,0.08)",
+                      }}
+                    >
+                      {f.tag}
+                    </span>
+                  </div>
+                  <p
+                    className="text-sm leading-relaxed max-w-lg"
+                    style={{ color: "#6B6D82" }}
+                  >
+                    {f.description}
+                  </p>
+                </div>
 
-                    {/* Description */}
-                    <p className="text-sm text-[#737373] leading-relaxed mb-6">
-                      {feature.description}
-                    </p>
-
-                    {/* Metric */}
-                    <div className="flex items-center gap-3 pt-5 border-t border-[#1f1f1f]">
-                      <span
-                        className={`text-2xl font-bold bg-gradient-to-r ${feature.highlight} bg-clip-text text-transparent`}
-                      >
-                        {feature.metric}
-                      </span>
-                      <span className="text-xs text-[#525252]">
-                        {feature.metricLabel}
-                      </span>
-                    </div>
+                {/* Metric */}
+                <div className="text-right flex-shrink-0">
+                  <div
+                    className="font-black text-3xl transition-colors"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "#2E3050",
+                    }}
+                  >
+                    {f.metric}
+                  </div>
+                  <div
+                    className="text-xs tracking-widest"
+                    style={{ fontFamily: "var(--font-mono)", color: "#4B4D62" }}
+                  >
+                    {f.metricLabel}
                   </div>
                 </div>
               </motion.div>
             );
           })}
         </div>
-
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-center mt-12"
-        >
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 transition-all duration-200 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
-          >
-            Empieza a crear gratis
-            <span className="text-violet-200">→</span>
-          </a>
-          <p className="mt-3 text-xs text-[#525252]">
-            Sin tarjeta de crédito · 90 créditos gratis al registrarte
-          </p>
-        </motion.div>
       </div>
     </section>
   );

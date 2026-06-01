@@ -108,27 +108,63 @@ const faqs = [
 
 export default function PricingPage() {
   return (
-    <main className="relative bg-[#0a0a0a] text-white min-h-screen overflow-x-hidden">
+    <main
+      className="relative text-white min-h-screen overflow-x-hidden"
+      style={{ background: "#0B0C10" }}
+    >
       <Navbar />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-4 sm:px-6 text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-          Elige tu plan
+        <h1
+          className="font-black uppercase text-center mb-4"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(40px,6vw,80px)",
+          }}
+        >
+          ELIGE<br />
+          <span style={{ color: "#A8FF00" }}>TU PLAN.</span>
         </h1>
-        <p className="text-lg text-[#737373] mb-8">
+        <p
+          className="text-lg mb-8"
+          style={{ color: "#6B6D82", fontFamily: "var(--font-sans)" }}
+        >
           Sin contratos. Cancela cuando quieras.
         </p>
 
         {/* Billing toggle — UI only */}
         <div className="flex flex-col items-center gap-2">
-          <div className="inline-flex items-center gap-1 bg-[#111] border border-[#262626] rounded-full p-1 shadow-inner">
-            <button className="px-5 py-2 text-sm font-semibold text-white bg-[#262626] rounded-full transition-all shadow-sm">
+          <div
+            className="inline-flex items-center gap-1 p-1"
+            style={{
+              border: "1px solid #1E2030",
+              background: "#12131A",
+            }}
+          >
+            <button
+              className="px-5 py-2 text-sm font-semibold transition-all"
+              style={{
+                background: "#A8FF00",
+                color: "#0B0C10",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
               Mensual
             </button>
-            <button className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-[#737373] hover:text-white rounded-full transition-all">
+            <button
+              className="flex items-center gap-2 px-5 py-2 text-sm font-semibold transition-all"
+              style={{ color: "#6B6D82", fontFamily: "var(--font-mono)" }}
+            >
               Anual
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-400 text-[10px] font-bold tracking-wide uppercase animate-pulse">
+              <span
+                className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase"
+                style={{
+                  background: "rgba(168,255,0,0.10)",
+                  border: "1px solid rgba(168,255,0,0.30)",
+                  color: "#A8FF00",
+                }}
+              >
                 Ahorra 20%
               </span>
             </button>
@@ -144,32 +180,67 @@ export default function PricingPage() {
               {/* Badge */}
               {plan.badge && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                  <span className="px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-violet-500 rounded-full shadow-lg shadow-violet-500/30">
+                  <span
+                    className="px-3 py-1 text-xs font-semibold uppercase tracking-widest"
+                    style={{
+                      background: "#A8FF00",
+                      color: "#0B0C10",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
                     {plan.badge}
                   </span>
                 </div>
               )}
 
               <div
-                className={
+                className="flex flex-col flex-1 p-8"
+                style={
                   plan.highlight
-                    ? "flex flex-col flex-1 rounded-2xl border-2 border-violet-500/50 bg-gradient-to-b from-violet-500/10 to-[#111] p-8 shadow-2xl shadow-violet-500/20"
-                    : "flex flex-col flex-1 rounded-2xl border border-[#262626] bg-[#111] p-8"
+                    ? {
+                        background: "#12131A",
+                        border: "2px solid #A8FF00",
+                        boxShadow: "0 0 40px rgba(168,255,0,0.10)",
+                      }
+                    : {
+                        background: "#12131A",
+                        border: "1px solid #1E2030",
+                      }
                 }
               >
                 {/* Plan header */}
                 <div className="mb-6">
-                  <h2 className="text-xl font-bold text-white mb-1">{plan.name}</h2>
-                  <p className="text-sm text-[#737373]">{plan.description}</p>
+                  <h2
+                    className="text-xl font-bold mb-1"
+                    style={{ color: "#F0F0F2", fontFamily: "var(--font-display)" }}
+                  >
+                    {plan.name}
+                  </h2>
+                  <p
+                    className="text-sm"
+                    style={{ color: "#6B6D82", fontFamily: "var(--font-sans)" }}
+                  >
+                    {plan.description}
+                  </p>
                 </div>
 
                 {/* Price */}
                 <div className="mb-8">
                   <div className="flex items-end gap-1">
-                    <span className={plan.highlight ? "text-5xl font-black text-white" : "text-4xl font-bold text-white"}>
+                    <span
+                      className="font-black"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: plan.highlight ? "3rem" : "2.5rem",
+                        color: plan.highlight ? "#A8FF00" : "#F0F0F2",
+                      }}
+                    >
                       ${plan.price}
                     </span>
-                    <span className="text-[#737373] mb-1 text-sm">
+                    <span
+                      className="mb-1 text-sm"
+                      style={{ color: "#6B6D82", fontFamily: "var(--font-mono)" }}
+                    >
                       /{plan.period}
                     </span>
                   </div>
@@ -178,10 +249,24 @@ export default function PricingPage() {
                 {/* CTA */}
                 <Link
                   href={plan.ctaHref}
-                  className={
+                  className="block text-center py-3 px-6 text-sm font-semibold transition-all duration-200 mb-8 uppercase tracking-widest"
+                  style={
                     plan.highlight
-                      ? "block text-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 transition-all duration-200 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 mb-8"
-                      : "block text-center py-3 px-6 rounded-xl text-sm font-semibold text-[#a3a3a3] border border-[#262626] hover:border-[#404040] hover:text-white transition-all duration-200 mb-8"
+                      ? {
+                          background: "#A8FF00",
+                          color: "#0B0C10",
+                          fontFamily: "var(--font-display)",
+                        }
+                      : {
+                          border: "1px solid #1E2030",
+                          color: "#6B6D82",
+                          fontFamily: "var(--font-mono)",
+                        }
+                  }
+                  onMouseEnter={
+                    plan.highlight
+                      ? undefined
+                      : undefined
                   }
                 >
                   {plan.cta}
@@ -191,8 +276,16 @@ export default function PricingPage() {
                 <ul className="space-y-3 mt-auto">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <span className="text-sm text-[#a3a3a3]">{feature}</span>
+                      <Check
+                        className="w-4 h-4 shrink-0 mt-0.5"
+                        style={{ color: "#A8FF00" }}
+                      />
+                      <span
+                        className="text-sm"
+                        style={{ color: "#6B6D82", fontFamily: "var(--font-sans)" }}
+                      >
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -203,24 +296,49 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="px-4 sm:px-6 pb-24 border-t border-[#1f1f1f] pt-16">
+      <section
+        className="px-4 sm:px-6 pb-24 pt-16"
+        style={{ borderTop: "1px solid #1E2030" }}
+      >
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-white text-center mb-10">
+          <h2
+            className="text-2xl font-bold text-center mb-10 uppercase tracking-widest"
+            style={{ color: "#F0F0F2", fontFamily: "var(--font-display)" }}
+          >
             Preguntas frecuentes
           </h2>
           <div className="space-y-3">
             {faqs.map((faq) => (
               <details
                 key={faq.question}
-                className="group bg-[#111] border border-[#262626] rounded-xl overflow-hidden"
+                className="group overflow-hidden"
+                style={{ background: "#12131A", border: "1px solid #1E2030" }}
               >
-                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none text-sm font-medium text-white select-none hover:bg-white/5 transition-colors">
+                <summary
+                  className="flex items-center justify-between px-5 py-4 cursor-pointer list-none text-sm select-none transition-colors"
+                  style={{
+                    color: "#F0F0F2",
+                    fontFamily: "var(--font-mono)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
+                >
                   {faq.question}
-                  <span className="ml-4 shrink-0 text-[#525252] group-open:rotate-180 transition-transform duration-200 text-lg leading-none">
+                  <span
+                    className="ml-4 shrink-0 group-open:rotate-180 transition-transform duration-200 text-lg leading-none"
+                    style={{ color: "#6B6D82" }}
+                  >
                     ↓
                   </span>
                 </summary>
-                <div className="px-5 pb-5 pt-1 text-sm text-[#737373] leading-relaxed border-t border-[#1f1f1f]">
+                <div
+                  className="px-5 pb-5 pt-1 text-sm leading-relaxed"
+                  style={{
+                    borderTop: "1px solid #1E2030",
+                    color: "#6B6D82",
+                    fontFamily: "var(--font-sans)",
+                  }}
+                >
                   {faq.answer}
                 </div>
               </details>
@@ -230,13 +348,16 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#1f1f1f] py-10 px-4 sm:px-6">
+      <footer
+        className="py-10 px-4 sm:px-6"
+        style={{ borderTop: "1px solid #1E2030" }}
+      >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">O</span>
-            </div>
-            <span className="text-sm text-[#737373]">
+            <span
+              className="text-sm"
+              style={{ color: "#6B6D82", fontFamily: "var(--font-mono)" }}
+            >
               © 2025 AIAIAI. Todos los derechos reservados.
             </span>
           </div>
@@ -245,7 +366,8 @@ export default function PricingPage() {
               <a
                 key={linkLabel}
                 href="#"
-                className="text-sm text-[#525252] hover:text-[#a3a3a3] transition-colors"
+                className="text-sm transition-colors"
+                style={{ color: "#6B6D82", fontFamily: "var(--font-mono)" }}
               >
                 {linkLabel}
               </a>

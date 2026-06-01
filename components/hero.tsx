@@ -3,16 +3,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
-  Link2,
-  Sparkles,
-  Users,
-  Play,
   AlertCircle,
   Plus,
   X,
   ListVideo,
   Settings,
+  Play,
+  Link2,
 } from "lucide-react";
 import type { ProcessVideoResponse, JobStatus } from "@/types";
 import ProcessingPanel from "./processing-panel";
@@ -308,83 +305,84 @@ export default function Hero() {
   return (
     <div>
       {/* ─── Hero section ───────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16">
-        {/* Background gradient orbs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-violet-600/15 rounded-full blur-[120px]" />
-          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-violet-800/10 rounded-full blur-[100px]" />
-          <div className="absolute top-1/3 right-1/4 w-[350px] h-[350px] bg-purple-600/10 rounded-full blur-[100px]" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-900/20 rounded-full blur-[100px]" />
-          {/* Grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          />
-        </div>
+      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-16 px-6 lg:px-12">
+        {/* Grid background */}
+        <div className="absolute inset-0 bg-grid pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          {/* Badge */}
+        {/* Glow orb — verde lima */}
+        <div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[120px] pointer-events-none"
+          style={{ background: "rgba(168,255,0,0.06)" }}
+        />
+
+        <div className="relative z-10 max-w-6xl mx-auto w-full">
+          {/* Status badge */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-sm font-medium"
+            transition={{ duration: 0.4 }}
+            className="inline-flex items-center gap-3 mb-8"
+            style={{ fontFamily: "var(--font-mono)" }}
           >
-            <Users className="w-3.5 h-3.5" />
-            Usado por más de 16M de creadores y empresas
+            <span className="flex items-center gap-1.5 text-xs uppercase tracking-widest" style={{ color: "#6B6D82" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
+              Sistema activo
+            </span>
+            <span style={{ color: "#2E3050" }}>|</span>
+            <span className="text-xs uppercase tracking-widest" style={{ color: "#6B6D82" }}>16M+ creadores</span>
           </motion.div>
 
-          {/* Headline */}
+          {/* HEADLINE — Unbounded, massive, left-aligned */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.05]"
+            className="font-black uppercase leading-[0.9] mb-10 tracking-tight"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(52px, 8vw, 120px)",
+            }}
           >
-            1 video largo,{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-              10 clips virales.
-            </span>
+            <span className="block" style={{ color: "#A8FF00" }}>CONVIERTE</span>
+            <span className="block text-white">CUALQUIER</span>
+            <span className="block text-white">VIDEO EN</span>
+            <span className="block" style={{ color: "#A8FF00" }}>CLIPS VIRALES.</span>
           </motion.h1>
 
-          {/* Subheadline */}
+          {/* Subtitle — DM Mono */}
           <motion.p
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg sm:text-xl text-[#a3a3a3] max-w-2xl mx-auto mb-10 leading-relaxed"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-sm mb-10 max-w-lg leading-relaxed"
+            style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
           >
-            AIAIAI convierte tus videos largos en shorts y los publica en todas
-            las redes sociales con un clic. Crea 10× más rápido con IA.
+            IA que detecta, extrae y exporta tus mejores momentos.<br />
+            <span style={{ color: "#4B4D62" }}>GPT-4o · Whisper · FFmpeg · 9:16 · 1:1 · 16:9</span>
           </motion.p>
 
-          {/* URL Input form */}
+          {/* URL INPUT AREA */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="max-w-2xl mx-auto mb-3"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="max-w-2xl mb-4"
           >
-            <form onSubmit={handleFormSubmit} className="flex flex-col sm:flex-row gap-3 mb-3">
+            <form onSubmit={handleFormSubmit} className="flex flex-col sm:flex-row gap-0 mb-4">
               <div
-                className={`flex-1 flex items-center gap-3 px-4 py-4 rounded-xl bg-[#111]
-                            border transition-colors group
-                            ${submitError
-                              ? "border-red-500/60"
-                              : "border-[#363636] hover:border-violet-500/50 focus-within:border-violet-500/60"
-                            }`}
+                className={`flex-1 flex items-center gap-3 px-4 py-4 border transition-colors ${
+                  submitError
+                    ? "border-[#FF3B3B]"
+                    : "border-[#1E2030] focus-within:border-[#A8FF00]/50"
+                }`}
+                style={{ background: "#12131A" }}
               >
-                <Link2
-                  className={`w-4 h-4 flex-shrink-0 transition-colors
-                              ${submitError
-                                ? "text-red-400"
-                                : "text-[#525252] group-focus-within:text-violet-400"
-                              }`}
-                />
+                <span
+                  className="text-sm flex-shrink-0"
+                  style={{ color: "#A8FF00", fontFamily: "var(--font-mono)" }}
+                >
+                  ▸
+                </span>
                 <input
                   type="url"
                   value={url}
@@ -392,8 +390,9 @@ export default function Hero() {
                     setUrl(e.target.value);
                     if (submitError) setSubmitError(null);
                   }}
-                  placeholder="Pega la URL del video de YouTube, Podcast o Zoom…"
-                  className="flex-1 bg-transparent text-sm text-white placeholder:text-[#525252] outline-none"
+                  placeholder="pega la URL del video..."
+                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-[#3B3D52]"
+                  style={{ fontFamily: "var(--font-mono)", color: "#F0F0F2" }}
                   disabled={isSubmitting}
                   autoComplete="off"
                   spellCheck={false}
@@ -406,58 +405,66 @@ export default function Hero() {
                 onClick={handleAddToQueue}
                 disabled={isSubmitting || !canAddToQueue}
                 title={urlQueue.length >= MAX_QUEUE ? `Máximo ${MAX_QUEUE} URLs` : "Añadir a la cola"}
-                className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl
-                           font-semibold text-sm text-[#a3a3a3] whitespace-nowrap
-                           bg-[#111] border border-[#363636]
-                           hover:text-white hover:border-violet-500/50 hover:bg-[#1a1a1a]
+                className="flex items-center justify-center gap-2 px-4 py-4
+                           text-xs uppercase tracking-widest whitespace-nowrap
+                           border border-l-0 border-[#1E2030]
                            disabled:opacity-40 disabled:cursor-not-allowed
-                           transition-all duration-200"
+                           transition-colors duration-150"
+                style={{
+                  background: "#12131A",
+                  color: "#6B6D82",
+                  fontFamily: "var(--font-mono)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) e.currentTarget.style.color = "#F0F0F2";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#6B6D82";
+                }}
               >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Añadir a cola</span>
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">+COLA</span>
               </button>
 
               {/* Main submit button */}
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl
-                           font-semibold text-sm text-white whitespace-nowrap
-                           bg-gradient-to-r from-violet-600 to-violet-500
-                           hover:from-violet-500 hover:to-violet-400
-                           disabled:from-violet-800 disabled:to-violet-700 disabled:opacity-60
-                           transition-all duration-200
-                           shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50
-                           disabled:cursor-not-allowed disabled:shadow-none"
+                className="px-8 py-4 font-black uppercase tracking-widest text-sm
+                           transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{
+                  background: isSubmitting ? "#6B7A00" : "#A8FF00",
+                  color: "#0B0C10",
+                  fontFamily: "var(--font-display)",
+                }}
               >
-                {isSubmitting ? (
-                  <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                      className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white"
-                    />
-                    {queueActive ? `${queueIndex} de ${queueTotal}…` : "Procesando…"}
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    {urlQueue.length > 0
-                      ? `Procesar ${urlQueue.length + (url.trim() ? 1 : 0)} videos`
-                      : "Obtener clips gratis"}
-                  </>
-                )}
+                {isSubmitting
+                  ? queueActive
+                    ? `${queueIndex}/${queueTotal}...`
+                    : "PROCESANDO..."
+                  : urlQueue.length > 0
+                  ? `PROCESAR ${urlQueue.length + (url.trim() ? 1 : 0)} →`
+                  : "PROCESAR →"}
               </button>
             </form>
 
             {/* Active settings badge — shown when settings differ from defaults */}
             {isNonDefault(activeSettings) && (
-              <div className="flex items-center justify-center gap-2 text-xs text-[#525252] mb-3">
+              <div
+                className="flex items-center gap-2 text-xs mb-3"
+                style={{ color: "#4B4D62", fontFamily: "var(--font-mono)" }}
+              >
                 <Settings className="w-3 h-3" />
                 <span>
-                  Modelo: {activeSettings.model} · {activeSettings.clipCount} clips · {activeSettings.minDuration}s–{activeSettings.maxDuration}s
+                  {activeSettings.model} · {activeSettings.clipCount} clips · {activeSettings.minDuration}s–{activeSettings.maxDuration}s
                 </span>
-                <a href="/dashboard/settings" className="text-violet-400 hover:text-violet-300 transition-colors">
+                <a
+                  href="/dashboard/settings"
+                  className="transition-colors"
+                  style={{ color: "#A8FF00" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#A8FF00")}
+                >
                   Cambiar
                 </a>
               </div>
@@ -471,13 +478,18 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.2 }}
-                  className="flex items-center justify-center gap-2 mb-3 text-violet-400 text-sm"
+                  className="flex items-center gap-2 mb-3 text-xs"
+                  style={{ color: "#A8FF00", fontFamily: "var(--font-mono)" }}
                 >
-                  <ListVideo className="w-4 h-4 flex-shrink-0" />
-                  Procesando {queueIndex} de {queueTotal} videos
-                  <div className="flex-1 max-w-[120px] h-1 rounded-full bg-[#1f1f1f] overflow-hidden">
+                  <ListVideo className="w-3.5 h-3.5 flex-shrink-0" />
+                  PROCESANDO {queueIndex} DE {queueTotal} VIDEOS
+                  <div
+                    className="flex-1 max-w-[120px] h-0.5 overflow-hidden"
+                    style={{ background: "#1E2030" }}
+                  >
                     <motion.div
-                      className="h-full rounded-full bg-violet-500"
+                      className="h-full"
+                      style={{ background: "#A8FF00" }}
                       animate={{ width: `${(queueIndex / queueTotal) * 100}%` }}
                       transition={{ duration: 0.4 }}
                     />
@@ -497,9 +509,12 @@ export default function Hero() {
                   className="overflow-hidden mb-3"
                 >
                   <div className="flex flex-col gap-1.5 text-left">
-                    <p className="text-xs text-[#525252] mb-1 flex items-center gap-1">
+                    <p
+                      className="text-xs mb-1 flex items-center gap-1 uppercase tracking-widest"
+                      style={{ color: "#4B4D62", fontFamily: "var(--font-mono)" }}
+                    >
                       <ListVideo className="w-3 h-3" />
-                      Cola de procesamiento ({urlQueue.length}/{MAX_QUEUE})
+                      Cola ({urlQueue.length}/{MAX_QUEUE})
                     </p>
                     {urlQueue.map((queuedUrl, i) => (
                       <motion.div
@@ -508,18 +523,29 @@ export default function Hero() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -8 }}
                         transition={{ duration: 0.15 }}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#111] border border-[#262626] group"
+                        className="flex items-center gap-2 px-3 py-2 border group"
+                        style={{ background: "#12131A", borderColor: "#1E2030" }}
                       >
-                        <Link2 className="w-3 h-3 text-[#525252] flex-shrink-0" />
-                        <span className="flex-1 text-xs text-[#a3a3a3] truncate font-mono">
+                        <Link2 className="w-3 h-3 flex-shrink-0" style={{ color: "#4B4D62" }} />
+                        <span
+                          className="flex-1 text-xs truncate"
+                          style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
+                        >
                           {truncateBadgeUrl(queuedUrl)}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleRemoveFromQueue(i)}
                           disabled={isSubmitting}
-                          className="p-0.5 rounded text-[#525252] hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+                          className="p-0.5 transition-colors disabled:opacity-40"
+                          style={{ color: "#4B4D62" }}
                           title="Eliminar de la cola"
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.color = "#FF3B3B")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.color = "#4B4D62")
+                          }
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -538,78 +564,111 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.2 }}
-                  className="flex items-center justify-center gap-2 mb-3
-                             text-red-400 text-sm"
+                  className="flex items-center gap-2 mb-3 text-xs"
+                  style={{ color: "#FF3B3B", fontFamily: "var(--font-mono)" }}
                 >
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                   {submitError}
                 </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
 
-          {/* Trust signals — compatible platforms */}
+          {/* Trust row — platforms + demo clips */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
-            className="flex items-center gap-3 mt-2 mb-4 justify-center flex-wrap"
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3"
           >
-            <span className="text-xs text-[#525252]">Compatible con:</span>
+            <span
+              className="text-xs uppercase tracking-widest"
+              style={{ fontFamily: "var(--font-mono)", color: "#4B4D62" }}
+            >
+              Compatible:
+            </span>
             {["YouTube", "Zoom", "Loom", "Podcast"].map((platform) => (
-              <span key={platform} className="text-xs text-[#404040] font-medium">
+              <span
+                key={platform}
+                className="text-xs uppercase tracking-widest"
+                style={{ fontFamily: "var(--font-mono)", color: "#3B3D52" }}
+              >
                 {platform}
               </span>
             ))}
           </motion.div>
 
-          {/* Demo options */}
+          {/* Demo clips */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex items-center justify-center gap-2 flex-wrap"
+            transition={{ duration: 0.5, delay: 0.45 }}
+            className="flex flex-wrap items-center gap-2 mb-12"
           >
-            <span className="text-xs text-[#525252]">Prueba con un demo:</span>
+            <span
+              className="text-xs uppercase tracking-widest"
+              style={{ fontFamily: "var(--font-mono)", color: "#4B4D62" }}
+            >
+              Demo:
+            </span>
             {demoClips.map((clip) => (
               <button
                 key={clip.label}
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => handleDemoClick(clip.label)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg
-                           text-xs text-[#a3a3a3] hover:text-white
-                           border border-[#262626] hover:border-[#404040]
-                           bg-[#111] hover:bg-[#1a1a1a]
-                           disabled:opacity-50 disabled:cursor-not-allowed
-                           transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs uppercase tracking-widest
+                           border disabled:opacity-50 disabled:cursor-not-allowed
+                           transition-all duration-150"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: "#6B6D82",
+                  borderColor: "#1E2030",
+                  background: "#12131A",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#F0F0F2";
+                  e.currentTarget.style.borderColor = "#A8FF00";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#6B6D82";
+                  e.currentTarget.style.borderColor = "#1E2030";
+                }}
               >
-                <Play className="w-3 h-3 fill-current" />
+                <Play className="w-2.5 h-2.5 fill-current" />
                 {clip.label}
-                <span className="text-[#525252]">· {clip.duration}</span>
+                <span style={{ color: "#4B4D62" }}>· {clip.duration}</span>
               </button>
             ))}
           </motion.div>
 
-          {/* Social proof stats */}
+          {/* Stats row */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-16 flex items-center justify-center gap-0 max-w-lg mx-auto"
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="flex items-center gap-8 pt-8 border-t"
+            style={{ borderColor: "#1E2030" }}
           >
             {[
-              { value: "16M+", label: "Creadores" },
-              { value: "10×", label: "Flujo más rápido" },
-              { value: "90%", label: "Tiempo ahorrado" },
-            ].map((stat, i) => (
-              <React.Fragment key={stat.label}>
-                {i > 0 && <div className="w-px h-10 bg-[#262626] mx-0" />}
-                <div className="flex-1 text-center">
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-xs text-[#737373] mt-0.5">{stat.label}</div>
+              { value: "16M+", label: "CREATORS" },
+              { value: "10×", label: "MÁS RÁPIDO" },
+              { value: "90%", label: "TIEMPO AHORRADO" },
+            ].map((s) => (
+              <div key={s.label}>
+                <div
+                  className="font-black text-2xl"
+                  style={{ fontFamily: "var(--font-display)", color: "#A8FF00" }}
+                >
+                  {s.value}
                 </div>
-              </React.Fragment>
+                <div
+                  className="text-xs tracking-widest"
+                  style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
+                >
+                  {s.label}
+                </div>
+              </div>
             ))}
           </motion.div>
         </div>
@@ -624,13 +683,19 @@ export default function Hero() {
               transition={{ delay: 1, duration: 0.8 }}
               className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             >
-              <span className="text-xs text-[#525252]">Desliza para explorar</span>
+              <span
+                className="text-xs uppercase tracking-widest"
+                style={{ fontFamily: "var(--font-mono)", color: "#4B4D62" }}
+              >
+                Scroll
+              </span>
               <motion.div
                 animate={{ y: [0, 6, 0] }}
                 transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
-                className="w-5 h-8 rounded-full border border-[#262626] flex items-start justify-center pt-1.5"
+                className="w-5 h-8 rounded-full border flex items-start justify-center pt-1.5"
+                style={{ borderColor: "#1E2030" }}
               >
-                <div className="w-1 h-2 rounded-full bg-violet-500" />
+                <div className="w-1 h-2 rounded-full" style={{ background: "#A8FF00" }} />
               </motion.div>
             </motion.div>
           )}
@@ -650,8 +715,12 @@ export default function Hero() {
             className="relative py-16 px-4"
           >
             {/* Subtle top separator */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16
-                            bg-gradient-to-b from-transparent via-violet-500/40 to-transparent" />
+            <div
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16"
+              style={{
+                background: "linear-gradient(to bottom, transparent, rgba(168,255,0,0.4), transparent)",
+              }}
+            />
 
             <div className="max-w-6xl mx-auto">
               {/* Section header */}
@@ -661,12 +730,18 @@ export default function Hero() {
                 transition={{ duration: 0.4, delay: 0.1 }}
                 className="text-center mb-10"
               >
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                <h2
+                  className="text-2xl sm:text-3xl font-bold text-white mb-2"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
                   {queueActive
                     ? `Procesando video ${queueIndex} de ${queueTotal}`
                     : "La IA está procesando tu video"}
                 </h2>
-                <p className="text-[#a3a3a3] text-sm">
+                <p
+                  className="text-sm"
+                  style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
+                >
                   Espera un momento — suele tardar entre 1 y 3 minutos.
                 </p>
               </motion.div>

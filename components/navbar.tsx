@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Zap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -26,58 +26,90 @@ export default function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-[#262626]"
+          ? "bg-[#0B0C10]/95 backdrop-blur-xl border-b border-[#A8FF00]/20"
           : "bg-transparent"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-1.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:shadow-violet-500/40 transition-shadow">
-              <Zap className="w-4 h-4 text-white fill-white" />
-            </div>
-            <span className="font-black text-lg tracking-tighter">
+          <a href="/" className="flex items-center gap-0 group">
+            <span
+              style={{ fontFamily: "var(--font-display)" }}
+              className="text-xl font-black tracking-widest uppercase"
+            >
               <span className="text-white">AI</span>
-              <span className="text-violet-400">AI</span>
+              <span style={{ color: "#A8FF00" }}>AI</span>
               <span className="text-white">AI</span>
             </span>
           </a>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="px-4 py-2 text-sm text-[#a3a3a3] hover:text-white rounded-lg hover:bg-white/5 transition-all duration-150"
-              >
-                {link.label}
-              </a>
+          <nav className="hidden md:flex items-center gap-0">
+            {navLinks.map((link, i) => (
+              <span key={link.label} className="flex items-center">
+                {i > 0 && (
+                  <span
+                    className="text-[#2E3050] select-none px-1"
+                    style={{ fontFamily: "var(--font-mono)" }}
+                  >
+                    /
+                  </span>
+                )}
+                <a
+                  href={link.href}
+                  className="px-3 py-2 text-xs uppercase tracking-widest transition-colors duration-150"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    color: "#6B6D82",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#F0F0F2")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "#6B6D82")
+                  }
+                >
+                  {link.label}
+                </a>
+              </span>
             ))}
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <a
               href="#"
-              className="text-sm text-[#a3a3a3] hover:text-white transition-colors"
+              className="text-xs font-medium uppercase tracking-widest transition-colors duration-150"
+              style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#F0F0F2")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#6B6D82")}
             >
-              Iniciar sesión
+              ACCEDER
             </a>
             <a
               href="#"
-              className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 transition-all duration-200 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+              className="px-5 py-2 text-xs font-black uppercase tracking-widest
+                         bg-[#A8FF00] text-[#0B0C10] rounded-none
+                         hover:bg-white transition-colors duration-150"
+              style={{ fontFamily: "var(--font-display)" }}
             >
-              Obtener clips gratis
+              PROCESAR VIDEO →
             </a>
           </div>
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden text-[#a3a3a3] hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="md:hidden p-2 transition-colors"
+            style={{ color: "#6B6D82" }}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color = "#F0F0F2")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color = "#6B6D82")
+            }
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -86,30 +118,50 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-[#262626]">
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+        <div
+          className="md:hidden border-b"
+          style={{
+            background: "rgba(11,12,16,0.97)",
+            backdropFilter: "blur(20px)",
+            borderColor: "#1E2030",
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-0.5">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="block px-4 py-3 text-sm text-[#a3a3a3] hover:text-white rounded-lg hover:bg-white/5 transition-all"
+                className="block px-4 py-3 text-xs uppercase tracking-widest transition-colors duration-150"
+                style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
                 onClick={() => setMobileOpen(false)}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "#F0F0F2")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "#6B6D82")
+                }
               >
                 {link.label}
               </a>
             ))}
-            <div className="pt-3 border-t border-[#262626] flex flex-col gap-2">
+            <div
+              className="pt-3 mt-2 border-t flex flex-col gap-2"
+              style={{ borderColor: "#1E2030" }}
+            >
               <a
                 href="#"
-                className="block px-4 py-3 text-sm text-center text-[#a3a3a3] hover:text-white rounded-lg hover:bg-white/5 transition-all"
+                className="block px-4 py-3 text-xs text-center uppercase tracking-widest transition-colors"
+                style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
               >
-                Iniciar sesión
+                ACCEDER
               </a>
               <a
                 href="#"
-                className="block px-4 py-3 text-sm font-semibold text-center text-white rounded-lg bg-gradient-to-r from-violet-600 to-violet-500"
+                className="block px-4 py-3 text-xs font-black text-center uppercase tracking-widest
+                           bg-[#A8FF00] text-[#0B0C10] hover:bg-white transition-colors duration-150"
+                style={{ fontFamily: "var(--font-display)" }}
               >
-                Obtener clips gratis
+                PROCESAR VIDEO →
               </a>
             </div>
           </div>

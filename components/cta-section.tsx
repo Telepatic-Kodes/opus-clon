@@ -1,34 +1,63 @@
-import Link from "next/link";
+"use client";
+import { ArrowRight } from "lucide-react";
 
 export default function CtaSection() {
   return (
-    <section className="relative py-24 px-4 sm:px-6 overflow-hidden">
+    <section
+      className="py-24 px-6 lg:px-12 relative overflow-hidden"
+      style={{ borderTop: "1px solid #1E2030" }}
+    >
       {/* Background glow */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-3xl" />
-      </div>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(168,255,0,0.06), transparent)",
+        }}
+      />
 
-      <div className="relative max-w-3xl mx-auto text-center">
-        <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
-          ¿Listo para crear{" "}
-          <span className="bg-gradient-to-r from-violet-400 to-violet-600 bg-clip-text text-transparent">
-            clips virales?
-          </span>
-        </h2>
-        <p className="text-lg text-[#737373] mb-10">
-          Miles de creadores ya están convirtiendo sus videos en contenido viral con IA.
-        </p>
-
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 transition-all duration-200 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-105"
-        >
-          Empezar gratis ahora →
-        </Link>
-
-        <p className="mt-5 text-sm text-[#525252]">
-          Sin tarjeta de crédito · 90 créditos gratis · Cancela cuando quieras
-        </p>
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="max-w-3xl">
+          <p
+            className="text-xs tracking-widest mb-6"
+            style={{ fontFamily: "var(--font-mono)", color: "#A8FF00" }}
+          >
+            ¿LISTO PARA EMPEZAR? /
+          </p>
+          <h2
+            className="font-black uppercase leading-[0.9] mb-8"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(40px, 6vw, 88px)",
+            }}
+          >
+            TUS VIDEOS.
+            <br />
+            <span style={{ color: "#A8FF00" }}>SUS MEJORES</span>
+            <br />
+            MOMENTOS.
+          </h2>
+          <p
+            className="text-sm mb-10 max-w-md"
+            style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}
+          >
+            Sin tarjeta de crédito. 90 créditos gratis.
+            <br />
+            Cancela cuando quieras.
+          </p>
+          <a
+            href="/"
+            className="inline-flex items-center gap-3 px-8 py-4 font-black uppercase tracking-widest text-sm transition-all hover:gap-5"
+            style={{
+              background: "#A8FF00",
+              color: "#0B0C10",
+              fontFamily: "var(--font-display)",
+            }}
+          >
+            EMPEZAR GRATIS
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </div>
     </section>
   );
