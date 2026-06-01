@@ -11,15 +11,21 @@ import {
   Settings,
   Menu,
   X,
+  CalendarClock,
+  Palette,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
 const navItems = [
-  { label: "Home", href: "/", icon: LayoutDashboard },
-  { label: "My Projects", href: "/dashboard", icon: Folder },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+  { label: "Home",          href: "/",                    icon: LayoutDashboard },
+  { label: "Mis Proyectos", href: "/dashboard",           icon: Folder },
+  { label: "Programar",     href: "/dashboard/schedule",  icon: CalendarClock },
+  { label: "Brand Kit",     href: "/dashboard/brand",     icon: Palette },
+  { label: "Analytics",     href: "/dashboard/analytics", icon: BarChart3 },
+  { label: "Settings",      href: "/dashboard/settings",  icon: Settings },
 ] as const;
 
 // ─── Sidebar content ──────────────────────────────────────────────────────────

@@ -71,3 +71,57 @@ export interface JobStatusResponse {
   createdAt: number;
   url: string;
 }
+
+// ─── Brand Kit ────────────────────────────────────────────────────────────────
+
+export interface BrandKit {
+  id: string;
+  name: string;
+  primaryColor: string;
+  textColor: string;
+  watermarkText: string;
+  watermarkPosition: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  watermarkSize: number;
+  introText?: string;
+  createdAt: number;
+}
+
+// ─── Scheduler ────────────────────────────────────────────────────────────────
+
+export interface ScheduledPost {
+  id: string;
+  clipId: string;
+  clipTitle: string;
+  clipVideoUrl: string;
+  jobId: string;
+  platform: "tiktok" | "instagram" | "youtube";
+  ratio: "9:16" | "1:1" | "16:9";
+  scheduledAt: number;
+  caption: string;
+  hashtags: string[];
+  status: "pending" | "published" | "failed";
+  createdAt: number;
+}
+
+// ─── Hooks A/B Testing ────────────────────────────────────────────────────────
+
+export interface HookVariant {
+  id: "A" | "B" | "C";
+  hook: string;
+  overlayText: string;
+  style: string;
+  emoji: string;
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+export interface AnalyticsData {
+  totalJobs: number;
+  totalClips: number;
+  avgScore: number;
+  totalFillersRemoved: number;
+  clipsByDay: Record<string, number>; // "2025-05-31" → count
+  scoreDistribution: { range: string; count: number; color: string }[];
+  topHashtags: { tag: string; count: number }[];
+  formatDistribution: { ratio: string; count: number }[];
+}

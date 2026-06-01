@@ -2,16 +2,19 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Clock, TrendingUp, Captions, Pencil, Check, RefreshCw, Share2, Play, Scissors, Smartphone, FileText, Zap, Keyboard } from "lucide-react";
+import { Download, Clock, TrendingUp, Captions, Pencil, Check, RefreshCw, Share2, Play, Scissors, Smartphone, FileText, Zap, Keyboard, TestTube, Languages } from "lucide-react";
 import type { Clip, ClipFormat } from "@/types";
 import TrimEditor from "@/components/trim-editor";
 import SocialPreview from "@/components/social-preview";
 import CaptionPanel from "@/components/caption-panel";
 import ScoreBreakdown from "@/components/score-breakdown";
 
+const HookTesterLazy = React.lazy(() => import("@/components/hook-tester"));
+const DubbingPanelLazy = React.lazy(() => import("@/components/dubbing-panel"));
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TabId = "video" | "editor" | "social" | "caption";
+type TabId = "video" | "editor" | "social" | "caption" | "hooks" | "dub";
 
 interface ClipCardProps {
   clip: Clip;
@@ -58,10 +61,12 @@ function ratioToFilename(ratio: ClipFormat["ratio"]): string {
 // ─── Tab definitions ──────────────────────────────────────────────────────────
 
 const TABS: { id: TabId; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: "video",   label: "Video",   Icon: Play },
-  { id: "editor",  label: "Editar",  Icon: Scissors },
-  { id: "social",  label: "Social",  Icon: Smartphone },
-  { id: "caption", label: "Caption", Icon: FileText },
+  { id: "video",   label: "VIDEO",   Icon: Play },
+  { id: "editor",  label: "EDITAR",  Icon: Scissors },
+  { id: "social",  label: "SOCIAL",  Icon: Smartphone },
+  { id: "caption", label: "CAPTION", Icon: FileText },
+  { id: "hooks",   label: "A/B",     Icon: TestTube },
+  { id: "dub",     label: "DOBLAR",  Icon: Languages },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -598,6 +603,20 @@ export default function ClipCard({ clip, index, jobId }: ClipCardProps) {
                 <div className="p-4">
                   <CaptionPanel clip={localClip} />
                 </div>
+              )}
+
+              {/* ── Hooks A/B tab ──────────────────────────────────────────── */}
+              {activeTab === "hooks" && (
+                <React.Suspense fallback={<div className="p-4 text-xs" style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}>CARGANDO...</div>}>
+                  <HookTesterLazy clip={localClip} />
+                </React.Suspense>
+              )}
+
+              {/* ── Dub tab ────────────────────────────────────────────────── */}
+              {activeTab === "dub" && (
+                <React.Suspense fallback={<div className="p-4 text-xs" style={{ fontFamily: "var(--font-mono)", color: "#6B6D82" }}>CARGANDO...</div>}>
+                  <DubbingPanelLazy clip={localClip} jobId={jobId} />
+                </React.Suspense>
               )}
             </motion.div>
           </AnimatePresence>
