@@ -43,7 +43,7 @@ export default function WelcomeBanner() {
 
           {/* Content */}
           <p className="text-base font-semibold text-white mb-2 pr-6">
-            👋 Bienvenido a OpusClip
+            👋 Bienvenido a AIAIAI
           </p>
           <p className="text-xs text-[#a3a3a3] leading-relaxed mb-3">
             Pega cualquier URL de YouTube y la IA generará clips virales

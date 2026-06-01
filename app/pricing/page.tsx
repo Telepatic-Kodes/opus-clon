@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import Navbar from "@/components/navbar";
 
 export const metadata: Metadata = {
-  title: "Precios — OpusClip",
+  title: "Precios — AIAIAI",
   description:
     "Elige el plan que mejor se adapta a tus necesidades. Sin contratos. Cancela cuando quieras.",
 };
@@ -26,7 +26,7 @@ const plans: Plan[] = [
     name: "Gratis",
     price: "0",
     period: "siempre",
-    description: "Perfecto para probar OpusClip",
+    description: "Perfecto para probar AIAIAI",
     highlight: false,
     badge: null,
     features: [
@@ -237,7 +237,7 @@ export default function PricingPage() {
               <span className="text-white text-xs font-bold">O</span>
             </div>
             <span className="text-sm text-[#737373]">
-              © 2025 OpusClip. Todos los derechos reservados.
+              © 2025 AIAIAI. Todos los derechos reservados.
             </span>
           </div>
           <div className="flex items-center gap-6">

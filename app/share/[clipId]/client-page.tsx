@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use, useRef } from "react";
 import Link from "next/link";
-import { Download, Loader2, AlertTriangle, Link2, Check } from "lucide-react";
+import { Download, Loader2, AlertTriangle, Link2, Check, Zap } from "lucide-react";
 import type { Clip, ClipFormat } from "@/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ export default function ShareClientPage({
           href="/"
           className="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 transition-colors"
         >
-          Ir a OpusClip
+          Ir a AIAIAI
         </Link>
       </div>
     );
@@ -228,10 +228,14 @@ export default function ShareClientPage({
         >
           {/* Logo */}
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-bold">O</span>
+            <Zap className="w-4 h-4 text-white fill-white" />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-sm font-semibold tracking-tight text-white">OpusClip</span>
+            <span className="font-black text-sm tracking-tighter">
+              <span className="text-white">AI</span>
+              <span className="text-violet-400">AI</span>
+              <span className="text-white">AI</span>
+            </span>
             <span className="text-[10px] text-violet-400/80 font-normal">IA que crea clips virales</span>
           </div>
         </Link>
@@ -343,7 +347,7 @@ export default function ShareClientPage({
 
       {/* ── Footer ── */}
       <footer className="text-center py-6 text-xs text-[#525252]">
-        Generado con OpusClip · IA de video
+        Generado con AIAIAI · IA de video
       </footer>
     </div>
   );

@@ -40,11 +40,11 @@ export async function generateMetadata({
   const data = await getClipData(clipId);
 
   if (!data) {
-    return { title: "Clip — OpusClip" };
+    return { title: "Clip — AIAIAI" };
   }
 
   const { clip } = data;
-  const title = `${clip.title} — Score ${clip.score}/100 | OpusClip`;
+  const title = `${clip.title} — Score ${clip.score}/100 | AIAIAI`;
   const description = clip.hook
     ? `${clip.hook}. ${clip.hashtags.slice(0, 5).join(" ")}`
     : `Clip viral generado con IA. Score de viralidad: ${clip.score}/100. ${clip.hashtags.slice(0, 5).join(" ")}`;

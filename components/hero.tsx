@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -358,7 +358,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg sm:text-xl text-[#a3a3a3] max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            OpusClip convierte tus videos largos en shorts y los publica en todas
+            AIAIAI convierte tus videos largos en shorts y los publica en todas
             las redes sociales con un clic. Crea 10× más rápido con IA.
           </motion.p>
 
@@ -603,13 +603,13 @@ export default function Hero() {
               { value: "10×", label: "Flujo más rápido" },
               { value: "90%", label: "Tiempo ahorrado" },
             ].map((stat, i) => (
-              <>
-                {i > 0 && <div key={`sep-${stat.label}`} className="w-px h-10 bg-[#262626] mx-0" />}
-                <div key={stat.label} className="flex-1 text-center">
+              <React.Fragment key={stat.label}>
+                {i > 0 && <div className="w-px h-10 bg-[#262626] mx-0" />}
+                <div className="flex-1 text-center">
                   <div className="text-2xl font-bold text-white">{stat.value}</div>
                   <div className="text-xs text-[#737373] mt-0.5">{stat.label}</div>
                 </div>
-              </>
+              </React.Fragment>
             ))}
           </motion.div>
         </div>

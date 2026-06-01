@@ -19,11 +19,13 @@ export default function Home() {
       <footer className="border-t border-[#1f1f1f] py-10 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">O</span>
+            <div className="flex items-center gap-1">
+              <span className="text-white text-sm font-black tracking-tighter">AI</span>
+              <span className="text-violet-400 text-sm font-black tracking-tighter">AI</span>
+              <span className="text-white text-sm font-black tracking-tighter">AI</span>
             </div>
             <span className="text-sm text-[#737373]">
-              © 2025 OpusClip. Todos los derechos reservados.
+              © 2025 AIAIAI. Todos los derechos reservados.
             </span>
           </div>
           <div className="flex items-center gap-6">

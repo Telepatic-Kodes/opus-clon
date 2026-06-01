@@ -10,11 +10,11 @@ const jakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "OpusClip — Convierte videos largos en clips virales",
+  title: "AIAIAI — Convierte videos largos en clips virales",
   description:
-    "OpusClip usa IA para convertir tus videos largos en 10 clips cortos virales con un clic. Usado por más de 16M de creadores y empresas.",
+    "AIAIAI usa IA para convertir tus videos largos en 10 clips cortos virales con un clic. Usado por más de 16M de creadores y empresas.",
   openGraph: {
-    title: "OpusClip — Convierte videos largos en clips virales",
+    title: "AIAIAI — Convierte videos largos en clips virales",
     description: "Herramienta de repurposing de video con IA para creadores y marketers.",
     type: "website",
   },

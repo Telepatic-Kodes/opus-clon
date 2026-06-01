@@ -33,12 +33,14 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shadow-lg shadow-violet-500/25">
+          <a href="/" className="flex items-center gap-1.5 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:shadow-violet-500/40 transition-shadow">
               <Zap className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="text-white font-bold text-lg tracking-tight">
-              OpusClip
+            <span className="font-black text-lg tracking-tighter">
+              <span className="text-white">AI</span>
+              <span className="text-violet-400">AI</span>
+              <span className="text-white">AI</span>
             </span>
           </a>
 

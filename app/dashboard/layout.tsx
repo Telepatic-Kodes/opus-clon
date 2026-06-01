@@ -39,8 +39,10 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/25">
             <Zap className="w-4 h-4 text-white fill-white" />
           </div>
-          <span className="text-sm font-bold text-white tracking-tight">
-            OpusClip
+          <span className="font-black text-sm tracking-tighter">
+            <span className="text-white">AI</span>
+            <span className="text-violet-400">AI</span>
+            <span className="text-white">AI</span>
           </span>
         </Link>
         {/* Close button — only on mobile overlay */}
@@ -84,7 +86,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       {/* Footer */}
       <div className="px-5 py-4 border-t border-[#1f1f1f]">
         <p className="text-[10px] text-[#404040]">
-          © {new Date().getFullYear()} OpusClip
+          © {new Date().getFullYear()} AIAIAI
         </p>
       </div>
     </div>
@@ -120,7 +122,11 @@ export default function DashboardLayout({
           <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center">
             <Zap className="w-3.5 h-3.5 text-white fill-white" />
           </div>
-          <span className="text-sm font-bold text-white">OpusClip</span>
+          <span className="font-black text-sm tracking-tighter">
+            <span className="text-white">AI</span>
+            <span className="text-violet-400">AI</span>
+            <span className="text-white">AI</span>
+          </span>
         </Link>
       </header>
 
